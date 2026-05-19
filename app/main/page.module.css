@@ -1,0 +1,243 @@
+.container {
+  min-height: 100vh;
+  background-color: #8DBEE4;
+
+  padding: 20px 16px 110px;
+}
+
+.header {
+  margin-bottom: 28px;
+}
+
+.logoWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 42px;
+  height: 42px;
+
+  object-fit: contain;
+}
+
+.logoText {
+  font-size: 28px;
+  font-weight: 700;
+
+  color: #0047B2;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+.sectionTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 14px;
+}
+
+.sectionTop h2 {
+  font-size: 24px;
+  font-weight: 700;
+
+  color: #0050C8;
+}
+
+.sectionTop button {
+  border: none;
+  background: none;
+
+  color: white;
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+.categoryWrap {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 10px;
+}
+
+.categoryWrap button {
+  border: none;
+  border-radius: 999px;
+
+  padding: 8px 16px;
+
+  background: white;
+
+  font-size: 14px;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.clubCard {
+  background: white;
+
+  border-radius: 28px;
+
+  padding: 18px;
+
+  display: flex;
+  gap: 16px;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.clubImage {
+  width: 82px;
+  height: 82px;
+
+  border: 2px solid #333;
+}
+
+.clubContent {
+  flex: 1;
+}
+
+.clubHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 12px;
+}
+
+.clubHeader h3 {
+  font-size: 28px;
+  color: #444;
+}
+
+.joinButton {
+  border: none;
+  border-radius: 999px;
+
+  background: #A7E9F7;
+
+  color: #007AA3;
+
+  padding: 8px 14px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.tagWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tagWrap span {
+  background: #D9D9D9;
+
+  border-radius: 999px;
+
+  padding: 4px 10px;
+
+  color: white;
+
+  font-size: 12px;
+}
+
+.eventCard {
+  background: white;
+
+  border-radius: 24px;
+
+  padding: 16px;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.eventImage {
+  width: 82px;
+  height: 82px;
+
+  border: 2px solid #333;
+}
+
+.eventContent {
+  flex: 1;
+}
+
+.eventClub {
+  font-size: 12px;
+  color: #666;
+
+  margin-bottom: 4px;
+}
+
+.eventContent h3 {
+  font-size: 28px;
+  color: #333;
+
+  margin-bottom: 8px;
+}
+
+.eventInfo {
+  display: flex;
+  gap: 16px;
+
+  font-size: 12px;
+  color: #666;
+}
+
+.arrow {
+  font-size: 48px;
+  font-weight: bold;
+}
+
+.bottomNav {
+  position: fixed;
+
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+
+  background: #8DBEE4;
+
+  display: flex;
+  justify-content: space-around;
+
+  padding: 12px 0;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  font-size: 12px;
+}
+
+.navItem span {
+  font-size: 24px;
+
+  margin-bottom: 4px;
+}
