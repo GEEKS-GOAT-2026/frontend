@@ -157,7 +157,7 @@ export default function MainPage() {
           className={styles.navItem}
           onClick={() => router.push("/main")}
         >
-          <span>🏠</span>
+          <img src="/main.svg" />
           <p>home</p>
         </div>
 
@@ -165,7 +165,7 @@ export default function MainPage() {
           className={styles.navItem}
           onClick={() => router.push("/clubs")}
         >
-          <span>🔍</span>
+          <img src="/clubs.svg" />
           <p>clubs</p>
         </div>
 
@@ -173,7 +173,7 @@ export default function MainPage() {
           className={styles.navItem}
           onClick={() => router.push("/events")}
         >
-          <span>📅</span>
+          <img src="/events.svg" />
           <p>events</p>
         </div>
 
@@ -181,7 +181,7 @@ export default function MainPage() {
           className={styles.navItem}
           onClick={() => router.push("/apply")}
         >
-          <span>✅</span>
+          <img src="/apply.svg" />
           <p>apply</p>
         </div>
 
@@ -189,7 +189,7 @@ export default function MainPage() {
           className={styles.navItem}
           onClick={() => router.push("/mypage")}
         >
-          <span>👤</span>
+          <img src="/mypage.svg" />
           <p>mypage</p>
         </div>
 
