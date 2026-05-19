@@ -1,32 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { useRouter } from "next/navigation";
-
+import BottomNavigation from "../components/BottomNavigation";
+import { apiFetch, apiRequest, ClubMember } from "../lib/api";
 import styles from "./page.module.css";
 
-type Member = {
-  id: number;
-
-  name: string;
-
-  major: string;
-
-  email: string;
-
-  birth: string;
-
-  phone: string;
-
-  image: string;
-
-  status: "member" | "applicant";
-};
+const CLUB_ID = 1;
 
 export default function ClubPresidentPage() {
-
-  const router = useRouter();
 
   const [activeTab, setActiveTab] =
     useState<"member" | "applicant">(
@@ -37,76 +19,65 @@ export default function ClubPresidentPage() {
     useState("");
 
   const [members, setMembers] =
-    useState<Member[]>([
-      {
-        id: 1,
-        name: "강민규",
-        major: "컴퓨터공학과 24학번",
-        email: "asd@gmail.com",
-        birth: "2001-12-12",
-        phone: "010-1234-5678",
-        image: "/logo.png",
-        status: "member",
-      },
+    useState<ClubMember[]>([]);
 
-      {
-        id: 2,
-        name: "홍길동",
-        major: "컴퓨터공학과 24학번",
-        email: "asdasd@gmail.com",
-        birth: "2001-12-12",
-        phone: "010-1234-5678",
-        image: "",
-        status: "applicant",
-      },
+  useEffect(() => {
+    const loadMembers = async () => {
+      try {
+        const query = new URLSearchParams({
+          status: activeTab,
+        });
 
-      {
-        id: 3,
-        name: "아이유",
-        major: "컴퓨터공학과 23학번",
-        email: "aaa@gmail.com",
-        birth: "2001-12-12",
-        phone: "010-1234-5678",
-        image: "",
-        status: "applicant",
-      },
+        if (search.trim()) {
+          query.set("keyword", search.trim());
+        }
 
-      {
-        id: 4,
-        name: "이찬혁",
-        major: "컴퓨터공학과 25학번",
-        email: "bbb@gmail.com",
-        birth: "2001-12-12",
-        phone: "010-1234-5678",
-        image: "",
-        status: "member",
-      },
-    ]);
+        const data = await apiFetch<ClubMember[]>(
+          `/api/clubs/${CLUB_ID}/members?${query.toString()}`
+        );
+
+        setMembers(data);
+      } catch (error) {
+        console.warn("Failed to load club members:", error);
+        setMembers([]);
+      }
+    };
+
+    void loadMembers();
+  }, [activeTab, search]);
 
   // 수락
-  const handleAccept = (id: number) => {
+  const handleAccept = async (id: number) => {
+    try {
+      await apiRequest<ClubMember>(
+        `/api/clubs/${CLUB_ID}/members/${id}/accept`,
+        { method: "PATCH" }
+      );
 
-    setMembers((prev) =>
-      prev.map((member) =>
-
-        member.id === id
-          ? {
-              ...member,
-              status: "member",
-            }
-          : member
-      )
-    );
+      setMembers((prev) =>
+        prev.filter((member) => member.id !== id)
+      );
+    } catch (error) {
+      console.warn("Failed to accept applicant:", error);
+    }
   };
 
   // 거절
-  const handleReject = (id: number) => {
+  const handleReject = async (id: number) => {
+    try {
+      await apiRequest<void>(
+        `/api/clubs/${CLUB_ID}/members/${id}`,
+        { method: "DELETE" }
+      );
 
-    setMembers((prev) =>
-      prev.filter(
-        (member) => member.id !== id
-      )
-    );
+      setMembers((prev) =>
+        prev.filter(
+          (member) => member.id !== id
+        )
+      );
+    } catch (error) {
+      console.warn("Failed to reject applicant:", error);
+    }
   };
 
   const filteredMembers =
@@ -273,50 +244,7 @@ export default function ClubPresidentPage() {
 
       </section>
 
-      {/* 하단 네비게이션 */}
-      <nav className={styles.bottomNav}>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/main")}
-        >
-          <img src="/main.svg" />
-          <p>home</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/clubs")}
-        >
-          <img src="/clubs.svg" />
-          <p>clubs</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/events")}
-        >
-          <img src="/events.svg" />
-          <p>events</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/apply")}
-        >
-          <img src="/apply.svg" />
-          <p>apply</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/mypage")}
-        >
-          <img src="/mypage.svg" />
-          <p>mypage</p>
-        </div>
-
-      </nav>
+      <BottomNavigation />
 
     </main>
   );

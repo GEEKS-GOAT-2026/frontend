@@ -1,16 +1,58 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
+import BottomNavigation from "../components/BottomNavigation";
+import { apiFetch, Club, ClubEvent, ClubPage } from "../lib/api";
 import styles from "./page.module.css";
 
 export default function MainPage() {
 
   const router = useRouter();
+  const [clubs, setClubs] = useState<Club[]>([]);
+  const [events, setEvents] = useState<ClubEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [clubsError, setClubsError] = useState("");
+  const [eventsError, setEventsError] = useState("");
+  const categories = [
+    { label: "전체", value: "" },
+    { label: "학술", value: "학술" },
+    { label: "예술, 문화", value: "문화" },
+    { label: "스포츠", value: "체육" },
+    { label: "봉사", value: "봉사" },
+    { label: "소모임", value: "취미" },
+  ];
 
-  const clubs = [1, 2, 3];
+  useEffect(() => {
+    const loadMainData = async () => {
+      setLoading(true);
+      setClubsError("");
+      setEventsError("");
 
-  const events = [1, 2, 3];
+      try {
+        const clubPage = await apiFetch<ClubPage>(
+          "/api/clubs?page=0&size=3&hasActiveRecruitment=true"
+        );
+        setClubs(clubPage.content);
+      } catch (error) {
+        console.warn("Failed to load main clubs:", error);
+        setClubsError("모집중인 동아리를 불러오지 못했습니다. 로그인 상태와 백엔드 실행 상태를 확인해주세요.");
+      }
+
+      try {
+        const recentEvents = await apiFetch<ClubEvent[]>("/api/events/recent?size=3");
+        setEvents(recentEvents);
+      } catch (error) {
+        console.warn("Failed to load recent events:", error);
+        setEventsError("최근 활동 및 행사를 불러오지 못했습니다. 백엔드에 행사 API가 반영됐는지 확인해주세요.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadMainData();
+  }, []);
 
   return (
     <main className={styles.container}>
@@ -40,12 +82,20 @@ export default function MainPage() {
         </div>
 
         <div className={styles.categoryWrap}>
-          <button>전체</button>
-          <button>학술</button>
-          <button>예술, 문화</button>
-          <button>스포츠</button>
-          <button>봉사</button>
-          <button>소모임</button>
+          {categories.map((category) => (
+            <button
+              key={category.label}
+              onClick={() =>
+                router.push(
+                  category.value
+                    ? `/clubs?category=${encodeURIComponent(category.value)}`
+                    : "/clubs"
+                )
+              }
+            >
+              {category.label}
+            </button>
+          ))}
         </div>
 
       </section>
@@ -67,35 +117,51 @@ export default function MainPage() {
 
           {clubs.map((club) => (
             <div
-              key={club}
+              key={club.id}
               className={styles.clubCard}
             >
 
-              <div className={styles.clubImage} />
+              <div className={styles.clubImage}>
+                {club.profileImg && (
+                  <img src={club.profileImg} alt={club.name} />
+                )}
+              </div>
 
               <div className={styles.clubContent}>
 
                 <div className={styles.clubHeader}>
 
-                  <h3>동아리 이름</h3>
+                  <h3>{club.name}</h3>
 
                   <button className={styles.joinButton}>
-                    가입가능
+                    {club.activeRecruitment
+                      ? club.recruitmentDisplayText ?? "가입가능"
+                      : "모집마감"}
                   </button>
 
                 </div>
 
                 <div className={styles.tagWrap}>
-                  <span>#code</span>
-                  <span>#project</span>
-                  <span>#community</span>
-                  <span>#activity</span>
+                  {club.category && <span>#{club.category}</span>}
+                  {club.description && <span>{club.description}</span>}
                 </div>
 
               </div>
 
             </div>
           ))}
+
+          {loading && clubs.length === 0 && (
+            <p className={styles.emptyText}>모집중인 동아리를 불러오는 중입니다.</p>
+          )}
+
+          {!loading && clubsError && clubs.length === 0 && (
+            <p className={styles.emptyText}>{clubsError}</p>
+          )}
+
+          {!loading && !clubsError && clubs.length === 0 && (
+            <p className={styles.emptyText}>모집중인 동아리가 없습니다.</p>
+          )}
 
         </div>
 
@@ -118,23 +184,27 @@ export default function MainPage() {
 
           {events.map((event) => (
             <div
-              key={event}
+              key={event.id}
               className={styles.eventCard}
             >
 
-              <div className={styles.eventImage} />
+              <div className={styles.eventImage}>
+                {event.imageUrl && (
+                  <img src={event.imageUrl} alt={event.title} />
+                )}
+              </div>
 
               <div className={styles.eventContent}>
 
                 <p className={styles.eventClub}>
-                  동아리 이름
+                  {event.clubName}
                 </p>
 
-                <h3>행사이름</h3>
+                <h3>{event.title}</h3>
 
                 <div className={styles.eventInfo}>
-                  <span>행사요일</span>
-                  <span>행사장소</span>
+                  <span>{event.eventDate}</span>
+                  {event.location && <span>{event.location}</span>}
                 </div>
 
               </div>
@@ -146,54 +216,23 @@ export default function MainPage() {
             </div>
           ))}
 
+          {loading && events.length === 0 && (
+            <p className={styles.emptyText}>최근 활동 및 행사를 불러오는 중입니다.</p>
+          )}
+
+          {!loading && eventsError && events.length === 0 && (
+            <p className={styles.emptyText}>{eventsError}</p>
+          )}
+
+          {!loading && !eventsError && events.length === 0 && (
+            <p className={styles.emptyText}>최근 활동 및 행사가 없습니다.</p>
+          )}
+
         </div>
 
       </section>
 
-      {/* 하단 네비게이션 */}
-      <nav className={styles.bottomNav}>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/main")}
-        >
-          <img src="/main.svg" />
-          <p>home</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/clubs")}
-        >
-          <img src="/clubs.svg" />
-          <p>clubs</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/events")}
-        >
-          <img src="/events.svg" />
-          <p>events</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/apply")}
-        >
-          <img src="/apply.svg" />
-          <p>apply</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/mypage")}
-        >
-          <img src="/mypage.svg" />
-          <p>mypage</p>
-        </div>
-
-      </nav>
+      <BottomNavigation />
 
     </main>
   );

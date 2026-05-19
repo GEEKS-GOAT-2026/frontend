@@ -2,11 +2,19 @@
 
 import styles from "./page.module.css";
 
-import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { apiRequest, saveAuthToken } from "../lib/api";
 
-export default function LoginPage() {
+type UserMe = {
+  id: number;
+  name: string;
+  email: string;
+};
+
+function LoginContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const backendLoginUrl =
     process.env.NEXT_PUBLIC_BACKEND_LOGIN_URL ??
@@ -33,29 +41,12 @@ export default function LoginPage() {
     // 로그인 성공 처리: token이 있으면 저장하고 API 응답을 콘솔로 출력
     if (token) {
       console.log("Received OAuth token:", token);
-      localStorage.setItem("accessToken", token);
-
-      try {
-        alert("로그인 성공: 토큰을 저장했습니다.");
-      } catch (e) {
-        console.warn("Could not show alert; falling back to console.", e);
-      }
+      saveAuthToken(token);
+      router.replace("/main");
 
       const fetchUser = async () => {
         try {
-          const response = await fetch("http://localhost:8080/api/users/me", {
-            headers: {
-              accept: "*/*",
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (!response.ok) {
-            console.warn("API response not OK:", response.status);
-            return;
-          }
-
-          const data = await response.json();
+          const data = await apiRequest<UserMe>("/api/users/me");
           
           // 사용자 정보를 localStorage에 저장
           localStorage.setItem("user", JSON.stringify(data));
@@ -65,13 +56,13 @@ export default function LoginPage() {
           
           console.log("User info saved:", data);
         } catch (err) {
-          console.error("Error fetching API after login:", err);
+          console.warn("Error fetching API after login:", err);
         }
       };
 
       void fetchUser();
     }
-  }, [searchParams]);
+  }, [router, searchParams]);
 
   const handleGoogleLogin = () => {
     window.location.href = backendLoginUrl;
@@ -116,5 +107,21 @@ export default function LoginPage() {
 
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className={styles.container}>
+          <div className={styles.wrapper}>
+            <p className={styles.notice}>로그인 페이지를 불러오는 중입니다.</p>
+          </div>
+        </main>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }

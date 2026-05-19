@@ -60,6 +60,43 @@
   flex-shrink: 0;
 }
 
+.filterSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
+
+.filterWrap {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 8px;
+}
+
+.filterButton,
+.activeFilter {
+  border: none;
+  border-radius: 999px;
+
+  padding: 7px 13px;
+
+  background: white;
+
+  color: #444;
+
+  font-size: 13px;
+
+  cursor: pointer;
+}
+
+.activeFilter {
+  background: #B8F1FF;
+  color: #0099C7;
+  font-weight: 700;
+}
+
 /* 동아리 목록 */
 .clubList {
   display: flex;
@@ -91,8 +128,15 @@
   height: 82px;
 
   border: 2px solid #333;
+  overflow: hidden;
 
   flex-shrink: 0;
+}
+
+.clubImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .clubContent {
@@ -133,6 +177,7 @@
 
   font-size: 12px;
   font-weight: 700;
+  white-space: nowrap;
 
   cursor: pointer;
 
@@ -156,6 +201,12 @@
   color: white;
 
   font-size: 11px;
+}
+
+.emptyText {
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 /* 하단 네비 */

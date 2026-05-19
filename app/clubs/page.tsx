@@ -1,35 +1,82 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-import { useRouter } from "next/navigation";
-
+import { useCallback, useEffect, useState } from "react";
+import BottomNavigation from "../components/BottomNavigation";
+import { apiFetch, Club, ClubPage } from "../lib/api";
 import styles from "./page.module.css";
 
 export default function ClubsPage() {
 
-  const router = useRouter();
+  const [clubs, setClubs] = useState<Club[]>([]);
+  const [category] = useState(() => {
+    if (typeof window === "undefined") {
+      return "";
+    }
 
-  const [clubs, setClubs] = useState<number[]>([]);
-  const [page, setPage] = useState(1);
+    return new URLSearchParams(window.location.search).get("category") ?? "";
+  });
+  const [selectedCategory, setSelectedCategory] = useState(category);
+  const [recruitmentFilter, setRecruitmentFilter] =
+    useState<"all" | "open" | "closed">("all");
+  const [keyword, setKeyword] = useState("");
+  const [page, setPage] = useState(0);
+  const [hasNext, setHasNext] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const categories = [
+    { label: "전체", value: "" },
+    { label: "학술", value: "학술" },
+    { label: "예술", value: "예술" },
+    { label: "문화", value: "문화" },
+    { label: "체육", value: "체육" },
+    { label: "봉사", value: "봉사" },
+    { label: "IT/개발", value: "IT/개발" },
+  ];
 
-  // 더미 데이터 추가
-  const loadMoreClubs = () => {
+  const loadClubs = useCallback(async (nextPage: number, reset = false) => {
+    if (loading || (!hasNext && !reset)) {
+      return;
+    }
 
-    const newClubs = Array.from(
-      { length: 6 },
-      (_, index) => index + page * 10
-    );
+    setLoading(true);
+    setError("");
 
-    setClubs((prev) => [...prev, ...newClubs]);
+    try {
+      const query = new URLSearchParams({
+        page: String(nextPage),
+        size: "10",
+      });
 
-    setPage((prev) => prev + 1);
-  };
+      if (keyword.trim()) {
+        query.set("keyword", keyword.trim());
+      }
 
-  // 첫 로딩
-  useEffect(() => {
-    loadMoreClubs();
-  }, []);
+      if (selectedCategory) {
+        query.set("category", selectedCategory);
+      }
+
+      if (recruitmentFilter !== "all") {
+        query.set(
+          "hasActiveRecruitment",
+          recruitmentFilter === "open" ? "true" : "false"
+        );
+      }
+
+      const clubPage = await apiFetch<ClubPage>(`/api/clubs?${query.toString()}`);
+
+      setClubs((prev) =>
+        reset ? clubPage.content : [...prev, ...clubPage.content]
+      );
+      setPage(clubPage.page + 1);
+      setHasNext(clubPage.hasNext);
+    } catch (error) {
+      console.warn("Failed to load clubs:", error);
+      setError("동아리 목록을 불러오지 못했습니다. 로그인 상태와 백엔드 실행 상태를 확인해주세요.");
+      setClubs((prev) => (reset ? [] : prev));
+    } finally {
+      setLoading(false);
+    }
+  }, [hasNext, keyword, loading, recruitmentFilter, selectedCategory]);
 
   // 무한 스크롤
   useEffect(() => {
@@ -50,7 +97,7 @@ export default function ClubsPage() {
         scrollTop + windowHeight >=
         fullHeight - 200
       ) {
-        loadMoreClubs();
+        void loadClubs(page);
       }
     };
 
@@ -66,7 +113,32 @@ export default function ClubsPage() {
       );
     };
 
-  }, [page]);
+  }, [loadClubs, page]);
+
+  const handleSearch = () => {
+    setPage(0);
+    setHasNext(true);
+    void loadClubs(0, true);
+  };
+
+  const handleCategoryFilter = (nextCategory: string) => {
+    setSelectedCategory(nextCategory);
+    setPage(0);
+    setHasNext(true);
+  };
+
+  const handleRecruitmentFilter = (nextFilter: "all" | "open" | "closed") => {
+    setRecruitmentFilter(nextFilter);
+    setPage(0);
+    setHasNext(true);
+  };
+
+  useEffect(() => {
+    // Initial/filter data is intentionally loaded from the backend API.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadClubs(0, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory, recruitmentFilter]);
 
   return (
     <main className={styles.container}>
@@ -86,10 +158,12 @@ export default function ClubsPage() {
           <input
             type="text"
             placeholder="동아리"
+            value={keyword}
+            onChange={(event) => setKeyword(event.target.value)}
             className={styles.searchInput}
           />
 
-          <button className={styles.searchButton}>
+          <button className={styles.searchButton} onClick={handleSearch}>
             🔍
           </button>
 
@@ -97,34 +171,91 @@ export default function ClubsPage() {
 
       </header>
 
+      <section className={styles.filterSection}>
+        <div className={styles.filterWrap}>
+          {categories.map((item) => (
+            <button
+              key={item.label}
+              className={
+                selectedCategory === item.value
+                  ? styles.activeFilter
+                  : styles.filterButton
+              }
+              onClick={() => handleCategoryFilter(item.value)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className={styles.filterWrap}>
+          <button
+            className={
+              recruitmentFilter === "all"
+                ? styles.activeFilter
+                : styles.filterButton
+            }
+            onClick={() => handleRecruitmentFilter("all")}
+          >
+            전체
+          </button>
+
+          <button
+            className={
+              recruitmentFilter === "open"
+                ? styles.activeFilter
+                : styles.filterButton
+            }
+            onClick={() => handleRecruitmentFilter("open")}
+          >
+            가입가능
+          </button>
+
+          <button
+            className={
+              recruitmentFilter === "closed"
+                ? styles.activeFilter
+                : styles.filterButton
+            }
+            onClick={() => handleRecruitmentFilter("closed")}
+          >
+            모집마감
+          </button>
+        </div>
+      </section>
+
       {/* 동아리 목록 */}
       <section className={styles.clubList}>
 
         {clubs.map((club) => (
           <div
-            key={club}
+            key={club.id}
             className={styles.clubCard}
           >
 
-            <div className={styles.clubImage} />
+            <div className={styles.clubImage}>
+              {club.profileImg && (
+                <img src={club.profileImg} alt={club.name} />
+              )}
+            </div>
 
             <div className={styles.clubContent}>
 
               <div className={styles.clubHeader}>
 
-                <h3>동아리 이름</h3>
+                <h3>{club.name}</h3>
 
                 <button className={styles.joinButton}>
-                  가입가능
+                  {club.activeRecruitment
+                    ? club.recruitmentDisplayText ?? "가입가능"
+                    : "모집마감"}
                 </button>
 
               </div>
 
               <div className={styles.tagWrap}>
-                <span>#code</span>
-                <span>#project</span>
-                <span>#community</span>
-                <span>#activity</span>
+                {club.category && <span>#{club.category}</span>}
+                {club.description && <span>{club.description}</span>}
               </div>
 
             </div>
@@ -132,52 +263,21 @@ export default function ClubsPage() {
           </div>
         ))}
 
+        {loading && clubs.length === 0 && (
+          <p className={styles.emptyText}>동아리 목록을 불러오는 중입니다.</p>
+        )}
+
+        {error && !loading && (
+          <p className={styles.emptyText}>{error}</p>
+        )}
+
+        {clubs.length === 0 && !loading && !error && (
+          <p className={styles.emptyText}>조건에 맞는 동아리가 없습니다.</p>
+        )}
+
       </section>
 
-      {/* 하단 네비 */}
-      <nav className={styles.bottomNav}>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/main")}
-        >
-          <img src="/main.svg" />
-          <p>home</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/clubs")}
-        >
-          <img src="/clubs.svg" />
-          <p>clubs</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/events")}
-        >
-          <img src="/events.svg" />
-          <p>events</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/apply")}
-        >
-          <img src="/apply.svg" />
-          <p>apply</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/mypage")}
-        >
-          <img src="/mypage.svg" />
-          <p>mypage</p>
-        </div>
-
-      </nav>
+      <BottomNavigation />
 
     </main>
   );

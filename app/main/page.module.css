@@ -105,6 +105,13 @@
   height: 82px;
 
   border: 2px solid #333;
+  overflow: hidden;
+}
+
+.clubImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .clubContent {
@@ -136,6 +143,7 @@
 
   font-size: 14px;
   font-weight: 700;
+  white-space: nowrap;
 
   cursor: pointer;
 }
@@ -158,6 +166,12 @@
   font-size: 12px;
 }
 
+.emptyText {
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .eventCard {
   background: white;
 
@@ -177,6 +191,13 @@
   height: 82px;
 
   border: 2px solid #333;
+  overflow: hidden;
+}
+
+.eventImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .eventContent {

@@ -1,0 +1,53 @@
+.container {
+  min-height: 100vh;
+  padding: 32px 20px 120px;
+  background: #8dbee4;
+  color: #0047b2;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 16px;
+  color: #333;
+}
+
+.card h2 {
+  margin: 4px 0 8px;
+  font-size: 22px;
+}
+
+.meta {
+  color: #666;
+  font-size: 13px;
+}
+
+.emptyText {
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.logoutButton {
+  margin-top: 24px;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: white;
+  color: #0047b2;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
