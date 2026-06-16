@@ -1,0 +1,27 @@
+.container {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #8dbee4;
+  padding: 16px 14px 110px;
+}
+
+.clubList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+.statusText {
+  color: #174568;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}

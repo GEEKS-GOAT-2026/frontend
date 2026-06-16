@@ -1,0 +1,49 @@
+.container {
+  min-height: 100vh;
+  background: #8dbee4;
+  padding: 20px 16px 110px;
+}
+
+.title {
+  color: #0050c8;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.card {
+  border-radius: 8px;
+  background: white;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.card h2 {
+  color: #333;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.card p {
+  color: #444;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.meta {
+  color: #666;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.emptyText {
+  color: #174568;
+  font-size: 14px;
+  line-height: 1.5;
+}

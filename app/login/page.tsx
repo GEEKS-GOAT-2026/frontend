@@ -2,15 +2,20 @@
 
 import styles from "./page.module.css";
 
-import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "https://port-0-dongnea-mhfzs5l502d0035e.sel3.cloudtype.app";
+
+function LoginContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const backendLoginUrl =
     process.env.NEXT_PUBLIC_BACKEND_LOGIN_URL ??
-    "http://localhost:8080/oauth2/authorization/google";
+    "https://port-0-dongnea-mhfzs5l502d0035e.sel3.cloudtype.app/oauth2/authorization/google";
 
   useEffect(() => {
     const token = searchParams.get("token") ?? searchParams.get("accessToken");
@@ -34,6 +39,7 @@ export default function LoginPage() {
     if (token) {
       console.log("Received OAuth token:", token);
       localStorage.setItem("accessToken", token);
+      router.replace("/main");
 
       try {
         alert("로그인 성공: 토큰을 저장했습니다.");
@@ -43,7 +49,7 @@ export default function LoginPage() {
 
       const fetchUser = async () => {
         try {
-          const response = await fetch("http://localhost:8080/api/users/me", {
+          const response = await fetch(`${apiBaseUrl}/api/users/me`, {
             headers: {
               accept: "*/*",
               Authorization: `Bearer ${token}`,
@@ -71,7 +77,7 @@ export default function LoginPage() {
 
       void fetchUser();
     }
-  }, [searchParams]);
+  }, [router, searchParams]);
 
   const handleGoogleLogin = () => {
     window.location.href = backendLoginUrl;
@@ -116,5 +122,13 @@ export default function LoginPage() {
 
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
   );
 }

@@ -1,0 +1,106 @@
+.clubCard {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 26px;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.clubCard[role="button"] {
+  cursor: pointer;
+}
+
+.clubCard[role="button"]:focus-visible {
+  outline: 3px solid #0050c8;
+  outline-offset: 3px;
+}
+
+.clubImage {
+  width: 82px;
+  height: 82px;
+  border: 2px solid #333;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #eef7ff;
+}
+
+.clubImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.clubContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.clubHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.clubTitle {
+  overflow: hidden;
+  color: #444;
+  font-size: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.description {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #555;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 10px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.joinButton {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: #b8f1ff;
+  color: #0099c7;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.tagWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  border-radius: 999px;
+  background: #d9d9d9;
+  color: white;
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+@media (max-width: 768px) {
+  .clubCard {
+    padding: 14px;
+  }
+
+  .clubImage {
+    width: 72px;
+    height: 72px;
+  }
+
+  .clubTitle {
+    font-size: 16px;
+  }
+}

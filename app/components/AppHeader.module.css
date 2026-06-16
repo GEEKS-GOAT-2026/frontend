@@ -1,0 +1,22 @@
+.header {
+  margin-bottom: 28px;
+}
+
+.logoWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.logoText {
+  color: #0047b2;
+  font-size: 28px;
+  font-weight: 700;
+}

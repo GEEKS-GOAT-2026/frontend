@@ -25,7 +25,6 @@ type Member = {
 };
 
 export default function ClubPresidentPage() {
-
   const router = useRouter();
 
   const [activeTab, setActiveTab] =

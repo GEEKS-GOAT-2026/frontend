@@ -263,16 +263,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 4px;
+  min-width: 52px;
 
+  color: #17324d;
+  font: inherit;
   font-size: 11px;
 
   cursor: pointer;
 }
 
-.navItem span {
-  font-size: 22px;
-
-  margin-bottom: 4px;
+.navItem img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 /* 반응형 */

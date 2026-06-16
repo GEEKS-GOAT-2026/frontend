@@ -1,0 +1,145 @@
+.container {
+  min-height: 100vh;
+  background: #8dbee4;
+  padding: 18px 14px 110px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.logoButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.logoButton img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.header h1 {
+  color: #0050c8;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.noticeList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.noticeCard {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  border-radius: 12px;
+  background: #fff;
+  padding: 9px 12px;
+  box-shadow: 2px 4px 6px rgba(47, 71, 95, 0.28);
+}
+
+.badgeSlot {
+  display: flex;
+  justify-content: center;
+  width: 46px;
+  flex-shrink: 0;
+}
+
+.importantBadge,
+.newBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 15px;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.importantBadge {
+  border: 1px solid #ff8f9d;
+  color: #ff6f82;
+}
+
+.newBadge {
+  border: 1px solid #57b9ee;
+  color: #188be0;
+}
+
+.noticeContent {
+  min-width: 0;
+  flex: 1;
+}
+
+.noticeContent h2 {
+  overflow: hidden;
+  color: #222;
+  font-size: 13px;
+  font-weight: 900;
+  margin-bottom: 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.noticeContent p {
+  overflow: hidden;
+  color: #222;
+  font-size: 9px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dateText {
+  color: #333;
+  font-size: 9px;
+  margin-left: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.chevron {
+  color: #111;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1;
+  margin-left: 14px;
+  flex-shrink: 0;
+}
+
+.statusText {
+  color: #174568;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (max-width: 360px) {
+  .noticeCard {
+    padding: 8px 10px;
+  }
+
+  .badgeSlot {
+    width: 40px;
+  }
+
+  .chevron {
+    margin-left: 10px;
+  }
+}

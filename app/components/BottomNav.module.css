@@ -1,0 +1,40 @@
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  background: #8dbee4;
+  backdrop-filter: blur(10px);
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 52px;
+  border: none;
+  background: transparent;
+  color: #17324d;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.activeNav {
+  border-radius: 12px;
+  background: rgba(0, 119, 255, 0.15);
+  padding: 4px 10px;
+}
+
+.navIcon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}

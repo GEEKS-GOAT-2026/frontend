@@ -1,0 +1,23 @@
+.container {
+  min-height: 100vh;
+  background: #8dbee4;
+  padding: 20px 16px 110px;
+}
+
+.title {
+  color: #0050c8;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.logoutButton {
+  border: none;
+  border-radius: 8px;
+  background: #0050c8;
+  color: white;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}

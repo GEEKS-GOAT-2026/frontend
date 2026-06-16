@@ -1,0 +1,280 @@
+.container {
+  min-height: 100vh;
+  background: #8dbee4;
+  padding: 18px 14px 132px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.logoButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.logoButton img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.header h1 {
+  color: #0050c8;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.header p {
+  color: #0050c8;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.summaryCard {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 108px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  background: #fff;
+  padding: 18px 20px;
+  box-shadow: 2px 4px 6px rgba(47, 71, 95, 0.28);
+}
+
+.clubImage {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border: 2px solid #111;
+  background: #fff;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.clubImage::before,
+.clubImage::after {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 82px;
+  height: 1.5px;
+  background: #111;
+  content: "";
+  transform-origin: center;
+}
+
+.clubImage::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.clubImage::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.clubImage img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.summaryContent {
+  min-width: 0;
+  flex: 1;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+
+.titleRow h2 {
+  overflow: hidden;
+  color: #5a5a5a;
+  font-size: 20px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.openBadge,
+.closedBadge {
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.openBadge {
+  background: #b8f1ff;
+  color: #0099c7;
+}
+
+.closedBadge {
+  background: #e4e4e4;
+  color: #777;
+}
+
+.tagWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 7px;
+}
+
+.tag {
+  max-width: 98px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #c8c8c8;
+  color: #fff;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.introSection {
+  margin-bottom: 10px;
+}
+
+.sectionTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.sectionTop h2 {
+  color: #0050c8;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.sectionTop button {
+  border: none;
+  background: transparent;
+  color: #0050c8;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.introCard {
+  min-height: 205px;
+  border-radius: 0 0 28px 28px;
+  background: #fff;
+  padding: 24px 18px;
+  box-shadow: 2px 4px 6px rgba(47, 71, 95, 0.28);
+}
+
+.joinedIntroCard {
+  min-height: 300px;
+}
+
+.introCard p {
+  color: #1d2b35;
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.quickMenu {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.quickCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 92px;
+  border: none;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 2px 4px 6px rgba(47, 71, 95, 0.28);
+  color: #111;
+  cursor: pointer;
+}
+
+.iconBox {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #57b9ee;
+  color: #111;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.quickCard strong {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.joinButton {
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 12px;
+  background: #0072d6;
+  color: white;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 5px 10px rgba(0, 80, 200, 0.24);
+}
+
+.joinButton:disabled {
+  background: #8aaec8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.statusText {
+  color: #174568;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (max-width: 360px) {
+  .summaryCard {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .titleRow {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .quickMenu {
+    gap: 8px;
+  }
+}
