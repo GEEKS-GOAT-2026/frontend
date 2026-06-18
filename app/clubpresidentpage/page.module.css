@@ -31,6 +31,13 @@
   color: #0057C2;
 }
 
+.clubName {
+  color: #174568;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
 .searchSection {
   margin-bottom: 22px;
 }
@@ -196,6 +203,31 @@
   line-height: 1.4;
 }
 
+.answerList {
+  display: grid;
+  gap: 8px;
+
+  margin-top: 10px;
+}
+
+.answerItem {
+  display: grid;
+  gap: 3px;
+}
+
+.answerItem dt {
+  color: #0057C2;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.answerItem dd {
+  color: #444;
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
 .buttonWrap {
   display: flex;
   flex-direction: column;
@@ -235,48 +267,110 @@
   cursor: pointer;
 }
 
-/* 하단 네비 */
-.bottomNav {
-  position: fixed;
+.removeButton {
+  border: none;
 
-  bottom: 0;
-  left: 0;
+  border-radius: 999px;
 
-  width: 100%;
+  padding: 8px 14px;
 
-  background: #8DBEE4;
+  background: #ef2f2f;
 
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+  color: white;
 
-  padding: 12px 0;
-
-  border-top: 1px solid rgba(255, 255, 255, 0.4);
-
-  backdrop-filter: blur(10px);
-
-  z-index: 100;
-}
-
-.navItem {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  min-width: 52px;
-
-  color: #17324d;
-  font: inherit;
-  font-size: 11px;
+  font-weight: 700;
 
   cursor: pointer;
 }
 
-.navItem img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
+.acceptButton:disabled,
+.rejectButton:disabled,
+.removeButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.statusText {
+  color: #174568;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(23, 50, 77, 0.32);
+  padding: 24px;
+}
+
+.confirmModal {
+  width: min(100%, 280px);
+  border-radius: 12px;
+  background: #fff;
+  padding: 22px 18px 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  text-align: center;
+}
+
+.confirmModal strong {
+  display: block;
+  color: #ef2f2f;
+  font-size: 18px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.confirmModal p {
+  color: #333;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.45;
+  margin-bottom: 10px;
+}
+
+.countdownText {
+  display: block;
+  color: #ef2f2f;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+  margin-bottom: 18px;
+}
+
+.modalActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cancelModalButton,
+.confirmRemoveButton {
+  min-height: 40px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cancelModalButton {
+  background: #e4e4e4;
+  color: #555;
+}
+
+.confirmRemoveButton {
+  background: #ef2f2f;
+  color: #fff;
+}
+
+.cancelModalButton:disabled,
+.confirmRemoveButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 /* 반응형 */

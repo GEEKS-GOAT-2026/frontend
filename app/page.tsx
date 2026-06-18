@@ -1,6 +1,6 @@
 "use client";
 
-http://localhost:3000import { useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Home() {

@@ -8,16 +8,134 @@
   color: #0050c8;
   font-size: 28px;
   font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: #174568;
+  font-size: 13px;
+  line-height: 1.4;
   margin-bottom: 18px;
 }
 
-.logoutButton {
+.profileCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: 8px;
+  background: #fff;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  margin-bottom: 18px;
+}
+
+.avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #ccecff;
+  flex-shrink: 0;
+}
+
+.profileInfo {
+  min-width: 0;
+  flex: 1;
+}
+
+.profileInfo h2 {
+  color: #0050c8;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.profileInfo p {
+  overflow: hidden;
+  color: #444;
+  font-size: 13px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profileInfo span {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #eaf7ff;
+  color: #0050c8;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 76px;
   border: none;
   border-radius: 8px;
-  background: #0050c8;
-  color: white;
-  padding: 12px 18px;
-  font-size: 15px;
-  font-weight: 700;
+  background: #fff;
+  padding: 20px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  text-align: left;
   cursor: pointer;
+}
+
+.card span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 6px;
+}
+
+.card strong {
+  color: #333;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.card small {
+  overflow: hidden;
+  color: #666;
+  font-size: 12px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card b {
+  color: #111;
+  font-size: 22px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.dangerCard strong,
+.dangerCard small {
+  color: #e44848;
+}
+
+.statusText {
+  color: #174568;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 360px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 }

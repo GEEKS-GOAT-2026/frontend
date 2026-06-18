@@ -1,0 +1,114 @@
+.container {
+  min-height: 100vh;
+  background: #8dbee4;
+  padding: 36px 16px 110px;
+}
+
+.title {
+  color: #0050c8;
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  color: #e44848;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 22px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.card {
+  border-radius: 8px;
+  background: #fff;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.presidentBadge {
+  background: #eaf7ff;
+  color: #0050c8;
+}
+
+.memberBadge {
+  background: #f0f7ff;
+  color: #4f8fbd;
+}
+
+.card h2 {
+  color: #333;
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 7px;
+}
+
+.card p {
+  color: #e44848;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+  margin-bottom: 7px;
+}
+
+.card small {
+  display: block;
+  color: #666;
+  font-size: 12px;
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+
+.actionButton {
+  width: 100%;
+  min-height: 44px;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.actionButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.transferButton {
+  background: #0050c8;
+}
+
+.leaveButton {
+  background: #ef2f2f;
+}
+
+.statusText {
+  color: #174568;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 360px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}

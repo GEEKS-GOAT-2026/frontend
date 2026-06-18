@@ -16,7 +16,7 @@ function getClubTags(club: Club) {
     .map((tag) => `#${tag}`);
 }
 
-export default function JoinedPage() {
+export default function MyClubPage() {
   const router = useRouter();
   const [keyword, setKeyword] = useState("");
   const [clubs, setClubs] = useState<Club[]>([]);
@@ -24,7 +24,7 @@ export default function JoinedPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const loadJoinedClubs = async () => {
+    const loadMyClubs = async () => {
       try {
         setIsLoading(true);
         setError("");
@@ -41,7 +41,7 @@ export default function JoinedPage() {
       }
     };
 
-    void loadJoinedClubs();
+    void loadMyClubs();
   }, []);
 
   const filteredClubs = useMemo(() => {
@@ -74,7 +74,7 @@ export default function JoinedPage() {
         </p>
       )}
 
-      <section className={styles.clubList} aria-label="가입한 동아리 목록">
+      <section className={styles.clubList} aria-label="내 동아리 목록">
         {filteredClubs.map((club) => (
           <ClubCard
             key={club.id}

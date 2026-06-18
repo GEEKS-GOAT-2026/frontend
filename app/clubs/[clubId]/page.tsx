@@ -4,7 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 import BottomNav from "../../components/BottomNav";
-import { ClubDetail, getClub, getJoinedClubs } from "../../lib/api";
+import {
+  ApplicationResponse,
+  ClubDetail,
+  getClub,
+  getJoinedClubs,
+  getMyApplications,
+  getMyInfo,
+} from "../../lib/api";
 
 import styles from "./page.module.css";
 
@@ -36,12 +43,66 @@ function getClubTags(club: ClubDetail) {
   ].filter(Boolean);
 }
 
+function hasPendingApplication(applications: ApplicationResponse[], clubId: number) {
+  return applications.some(
+    (application) => {
+      if (application.clubId !== clubId) {
+        return false;
+      }
+
+      const status = application.status.toLowerCase();
+      const completedStatuses = [
+        "accepted",
+        "approved",
+        "approve",
+        "member",
+        "rejected",
+        "reject",
+        "cancelled",
+        "canceled",
+        "left",
+      ];
+
+      if (completedStatuses.some((completedStatus) => status.includes(completedStatus))) {
+        return false;
+      }
+
+      return ["pending", "waiting", "wait", "applied", "submitted", "review"].some(
+        (pendingStatus) => status.includes(pendingStatus)
+      );
+    }
+  );
+}
+
+function hasLocalPendingApplication(clubId: number) {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return localStorage.getItem(`pendingApplication:${clubId}`) === "true";
+}
+
+function isManagedClub(
+  managedClubs: { clubId: number; role: string }[] | undefined,
+  clubId: number
+) {
+  return (
+    managedClubs?.some(
+      (club) =>
+        club.clubId === clubId &&
+        (club.role.toUpperCase().includes("PRESIDENT") || club.role.includes("회장"))
+    ) ?? false
+  );
+}
+
 export default function ClubDetailPage() {
   const router = useRouter();
   const params = useParams<{ clubId: string }>();
   const clubId = Number(params.clubId);
   const [club, setClub] = useState<ClubDetail | null>(null);
   const [isJoined, setIsJoined] = useState(false);
+  const [isApplicationPending, setIsApplicationPending] = useState(false);
+  const [isClubPresident, setIsClubPresident] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -61,19 +122,38 @@ export default function ClubDetailPage() {
       try {
         setIsLoading(true);
         setError("");
-        const [clubResult, joinedResult] = await Promise.allSettled([
+        const [clubResult, myClubResult, applicationResult, userResult] = await Promise.allSettled([
           getClub(clubId),
           getJoinedClubs(),
+          getMyApplications(),
+          getMyInfo(),
         ]);
 
         if (clubResult.status === "rejected") {
           throw clubResult.reason;
         }
 
+        const joined =
+          myClubResult.status === "fulfilled" &&
+          myClubResult.value.some((myClub) => myClub.id === clubId);
+        const applicationPending =
+          applicationResult.status === "fulfilled"
+            ? hasPendingApplication(applicationResult.value, clubId)
+            : hasLocalPendingApplication(clubId);
+
+        if (
+          typeof window !== "undefined" &&
+          (joined || (applicationResult.status === "fulfilled" && !applicationPending))
+        ) {
+          localStorage.removeItem(`pendingApplication:${clubId}`);
+        }
+
         setClub(clubResult.value);
-        setIsJoined(
-          joinedResult.status === "fulfilled" &&
-            joinedResult.value.some((joinedClub) => joinedClub.id === clubId)
+        setIsJoined(joined);
+        setIsApplicationPending(!joined && applicationPending);
+        setIsClubPresident(
+          userResult.status === "fulfilled" &&
+            isManagedClub(userResult.value.managedClubs, clubId)
         );
       } catch (err) {
         setError(err instanceof Error ? err.message : "동아리 정보를 불러오지 못했습니다.");
@@ -90,7 +170,11 @@ export default function ClubDetailPage() {
       return;
     }
 
-    alert("지원서 작성 화면은 준비 중입니다.");
+    router.push(`/clubs/${clubId}/apply`);
+  };
+
+  const handleManageClick = () => {
+    router.push(`/clubpresidentpage?clubId=${clubId}`);
   };
 
   return (
@@ -140,7 +224,7 @@ export default function ClubDetailPage() {
               <h2>동아리 소개</h2>
               <button type="button">더보기→</button>
             </div>
-            <div className={`${styles.introCard} ${isJoined ? styles.joinedIntroCard : ""}`}>
+            <div className={`${styles.introCard} ${isJoined ? styles.myClubIntroCard : ""}`}>
               <p>{club.activityDescription || club.description || "아직 등록된 동아리 소개가 없습니다."}</p>
             </div>
           </section>
@@ -176,16 +260,28 @@ export default function ClubDetailPage() {
             </button>
           </section>
 
-          {!isJoined && (
+          {isClubPresident ? (
+            <button
+              type="button"
+              className={`${styles.joinButton} ${styles.manageButton}`}
+              onClick={handleManageClick}
+            >
+              동아리 관리
+            </button>
+          ) : !isJoined ? (
             <button
               type="button"
               className={styles.joinButton}
-              disabled={!activeRecruitment}
+              disabled={!activeRecruitment || isApplicationPending}
               onClick={handleJoinClick}
             >
-              {activeRecruitment ? "가입하기" : "현재 모집중이 아닙니다"}
+              {isApplicationPending
+                ? "가입신청 대기중"
+                : activeRecruitment
+                  ? "가입하기"
+                  : "현재 모집중이 아닙니다"}
             </button>
-          )}
+          ) : null}
         </>
       )}
 

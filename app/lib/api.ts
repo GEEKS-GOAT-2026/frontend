@@ -6,6 +6,8 @@ export type User = {
   id: number;
   email: string;
   name: string;
+  manager?: boolean;
+  managedClubs?: ManagedClub[];
 };
 
 export type Club = {
@@ -75,6 +77,42 @@ export type ClubNotice = {
   pinned: boolean;
 };
 
+export type ManagedClub = {
+  clubId: number;
+  clubName: string;
+  role: string;
+};
+
+export type ApplicationResponse = {
+  id: number;
+  recruitmentId: number;
+  recruitmentTitle: string;
+  clubId: number;
+  clubName: string;
+  userId: number;
+  userName: string;
+  userEmail: string;
+  answers: Record<string, unknown>;
+  status: string;
+};
+
+export type ClubMember = {
+  id: number;
+  name: string;
+  major: string | null;
+  studentId?: string | null;
+  email: string;
+  birth: string | null;
+  phone: string | null;
+  image: string | null;
+  status: "member" | "applicant" | "rejected" | "left" | string;
+  answers?: Record<string, unknown> | null;
+  applicationAnswers?: Record<string, unknown> | null;
+  application?: {
+    answers?: Record<string, unknown> | null;
+  } | null;
+};
+
 export type EventPage = {
   content: ClubEvent[];
   page: number;
@@ -101,6 +139,11 @@ type EventListParams = {
 
 type RecentEventParams = {
   size?: number;
+};
+
+type ClubMemberParams = {
+  status?: "member" | "applicant";
+  keyword?: string;
 };
 
 function getAccessToken() {
@@ -156,6 +199,17 @@ export async function apiFetch<T>(
 
   if (!response.ok) {
     throw new Error(`API 요청 실패: ${response.status}`);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  const contentLength = response.headers.get("Content-Length");
+  const contentType = response.headers.get("Content-Type");
+
+  if (contentLength === "0" || !contentType?.includes("application/json")) {
+    return undefined as T;
   }
 
   return response.json() as Promise<T>;
@@ -226,6 +280,10 @@ export async function getJoinedClubs() {
   return apiFetch<Club[]>("/api/users/me/clubs");
 }
 
+export function getMyApplications() {
+  return apiFetch<ApplicationResponse[]>("/api/applications/me");
+}
+
 export function getClubActivityRecords(clubId: number) {
   return apiFetch<ClubActivityRecord[]>(`/api/clubs/${clubId}/activities`);
 }
@@ -234,12 +292,54 @@ export function getClubNotices(clubId: number) {
   return apiFetch<ClubNotice[]>(`/api/clubs/${clubId}/notices`);
 }
 
+export function getClubMembers(
+  clubId: number,
+  { status, keyword }: ClubMemberParams = {}
+) {
+  return apiFetch<ClubMember[]>(
+    `/api/clubs/${clubId}/members`,
+    {},
+    {
+      status: status ?? "",
+      keyword: keyword ?? "",
+    }
+  );
+}
+
 export function submitApplication(
   recruitmentId: number,
   answers: Record<string, unknown>
 ) {
-  return apiFetch<string>(`/api/applications?recruitmentId=${recruitmentId}`, {
+  return apiFetch<ApplicationResponse>("/api/applications", {
     method: "POST",
-    body: JSON.stringify(answers),
+    body: JSON.stringify({
+      recruitmentId,
+      answers,
+    }),
+  });
+}
+
+export function leaveMyClub(clubId: number) {
+  return apiFetch<void>(`/api/users/me/clubs/${clubId}`, {
+    method: "DELETE",
+  });
+}
+
+export function transferPresident(clubId: number, targetEmail: string) {
+  return apiFetch<void>(`/api/clubs/${clubId}/managers/president/transfer`, {
+    method: "PATCH",
+    body: JSON.stringify({ targetEmail }),
+  });
+}
+
+export function acceptClubMember(clubId: number, memberId: number) {
+  return apiFetch<ClubMember>(`/api/clubs/${clubId}/members/${memberId}/accept`, {
+    method: "PATCH",
+  });
+}
+
+export function rejectClubMember(clubId: number, memberId: number) {
+  return apiFetch<void>(`/api/clubs/${clubId}/members/${memberId}`, {
+    method: "DELETE",
   });
 }

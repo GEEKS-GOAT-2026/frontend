@@ -1,153 +1,288 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import { useRouter } from "next/navigation";
+import BottomNav from "../components/BottomNav";
+import {
+  ClubMember,
+  acceptClubMember,
+  getClubMembers,
+  getMyInfo,
+  rejectClubMember,
+} from "../lib/api";
 
 import styles from "./page.module.css";
 
-type Member = {
-  id: number;
+type ActiveTab = "member" | "applicant";
 
-  name: string;
+function getManagedClubIdFromQuery(searchParams: URLSearchParams) {
+  const rawClubId = searchParams.get("clubId");
+  const parsedClubId = rawClubId ? Number(rawClubId) : NaN;
 
-  major: string;
+  return Number.isFinite(parsedClubId) ? parsedClubId : null;
+}
 
-  email: string;
+function getApplicantAnswers(member: ClubMember) {
+  return (
+    member.answers ??
+    member.applicationAnswers ??
+    member.application?.answers ??
+    {}
+  );
+}
 
-  birth: string;
+function getAnswerText(
+  answers: Record<string, unknown>,
+  key: string,
+  fallback = ""
+) {
+  const value = answers[key];
 
-  phone: string;
+  if (value === undefined || value === null) {
+    return fallback;
+  }
 
-  image: string;
+  if (Array.isArray(value)) {
+    return value.map(String).join(", ");
+  }
 
-  status: "member" | "applicant";
-};
+  if (typeof value === "object") {
+    return JSON.stringify(value);
+  }
 
-export default function ClubPresidentPage() {
+  return String(value);
+}
+
+function getApplicantField(
+  member: ClubMember,
+  answers: Record<string, unknown>,
+  key: "name" | "major" | "studentId" | "email" | "birth" | "phone"
+) {
+  const memberValue = member[key];
+  const answerValue = getAnswerText(answers, key);
+
+  return answerValue || memberValue || "";
+}
+
+function getAnswerLabel(key: string) {
+  const labels: Record<string, string> = {
+    name: "신청자 이름",
+    major: "학과",
+    studentId: "학번",
+    email: "이메일",
+    birth: "생년월일",
+    phone: "전화번호",
+    motivation: "지원 동기",
+  };
+
+  return labels[key] ?? key;
+}
+
+function getExtraAnswers(answers: Record<string, unknown>) {
+  const primaryKeys = new Set([
+    "name",
+    "major",
+    "studentId",
+    "email",
+    "birth",
+    "phone",
+  ]);
+
+  return Object.entries(answers)
+    .filter(([key, value]) => !primaryKeys.has(key) && value !== null && value !== "")
+    .map(([key]) => [getAnswerLabel(key), getAnswerText(answers, key)] as const)
+    .filter(([, value]) => value);
+}
+
+function ClubPresidentContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<ActiveTab>("member");
+  const [search, setSearch] = useState("");
+  const [clubId, setClubId] = useState<number | null>(null);
+  const [clubName, setClubName] = useState("회장 계정");
+  const [members, setMembers] = useState<ClubMember[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [processingMemberId, setProcessingMemberId] = useState<number | null>(null);
+  const [memberToRemove, setMemberToRemove] = useState<ClubMember | null>(null);
+  const [removeCountdown, setRemoveCountdown] = useState(0);
+  const [error, setError] = useState("");
 
-  const [activeTab, setActiveTab] =
-    useState<"member" | "applicant">(
-      "member"
-    );
+  useEffect(() => {
+    const loadManagedClub = async () => {
+      try {
+        setError("");
+        const user = await getMyInfo();
+        const queryClubId = getManagedClubIdFromQuery(searchParams);
+        const targetClub =
+          user.managedClubs?.find((club) => club.clubId === queryClubId) ??
+          user.managedClubs?.[0];
 
-  const [search, setSearch] =
-    useState("");
+        if (!targetClub) {
+          setError("관리할 수 있는 동아리가 없습니다.");
+          setIsLoading(false);
+          return;
+        }
 
-  const [members, setMembers] =
-    useState<Member[]>([
-      {
-        id: 1,
-        name: "강민규",
-        major: "컴퓨터공학과 24학번",
-        email: "asd@gmail.com",
-        birth: "2001-12-12",
-        phone: "010-1234-5678",
-        image: "/logo.png",
-        status: "member",
-      },
+        setClubId(targetClub.clubId);
+        setClubName(targetClub.clubName);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "회장 계정 정보를 불러오지 못했습니다."
+        );
+        setIsLoading(false);
+      }
+    };
 
-      {
-        id: 2,
-        name: "홍길동",
-        major: "컴퓨터공학과 24학번",
-        email: "asdasd@gmail.com",
-        birth: "2001-12-12",
-        phone: "010-1234-5678",
-        image: "",
-        status: "applicant",
-      },
+    void loadManagedClub();
+  }, [searchParams]);
 
-      {
-        id: 3,
-        name: "아이유",
-        major: "컴퓨터공학과 23학번",
-        email: "aaa@gmail.com",
-        birth: "2001-12-12",
-        phone: "010-1234-5678",
-        image: "",
-        status: "applicant",
-      },
+  useEffect(() => {
+    const loadMembers = async () => {
+      if (!clubId) {
+        return;
+      }
 
-      {
-        id: 4,
-        name: "이찬혁",
-        major: "컴퓨터공학과 25학번",
-        email: "bbb@gmail.com",
-        birth: "2001-12-12",
-        phone: "010-1234-5678",
-        image: "",
-        status: "member",
-      },
-    ]);
+      try {
+        setIsLoading(true);
+        setError("");
+        const data = await getClubMembers(clubId, {
+          status: activeTab,
+          keyword: search.trim(),
+        });
+        setMembers(data);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "회원 목록을 불러오지 못했습니다."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // 수락
-  const handleAccept = (id: number) => {
+    void loadMembers();
+  }, [activeTab, clubId, search]);
 
-    setMembers((prev) =>
-      prev.map((member) =>
+  useEffect(() => {
+    if (!memberToRemove) {
+      return;
+    }
 
-        member.id === id
-          ? {
-              ...member,
-              status: "member",
-            }
-          : member
-      )
-    );
+    const timerId = window.setInterval(() => {
+      setRemoveCountdown((currentCount) => {
+        if (currentCount <= 1) {
+          window.clearInterval(timerId);
+          return 0;
+        }
+
+        return currentCount - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(timerId);
+  }, [memberToRemove]);
+
+  const openRemoveModal = (member: ClubMember) => {
+    setRemoveCountdown(3);
+    setMemberToRemove(member);
   };
 
-  // 거절
-  const handleReject = (id: number) => {
-
-    setMembers((prev) =>
-      prev.filter(
-        (member) => member.id !== id
-      )
-    );
+  const closeRemoveModal = () => {
+    setMemberToRemove(null);
+    setRemoveCountdown(0);
   };
 
-  const filteredMembers =
-    members.filter((member) => {
+  const filteredMembers = useMemo(() => members, [members]);
 
-      const matchTab =
-        member.status === activeTab;
+  const handleAccept = async (memberId: number) => {
+    if (!clubId) {
+      return;
+    }
 
-      const matchSearch =
-        member.name.includes(search);
+    try {
+      setProcessingMemberId(memberId);
+      await acceptClubMember(clubId, memberId);
+      setMembers((currentMembers) =>
+        currentMembers.filter((member) => member.id !== memberId)
+      );
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "신청자 수락에 실패했습니다.");
+    } finally {
+      setProcessingMemberId(null);
+    }
+  };
 
-      return matchTab && matchSearch;
-    });
+  const handleReject = async (memberId: number) => {
+    if (!clubId) {
+      return;
+    }
+
+    try {
+      setProcessingMemberId(memberId);
+      await rejectClubMember(clubId, memberId);
+      setMembers((currentMembers) =>
+        currentMembers.filter((member) => member.id !== memberId)
+      );
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "신청자 거절에 실패했습니다.");
+    } finally {
+      setProcessingMemberId(null);
+    }
+  };
+
+  const handleRemoveMember = async () => {
+    if (!clubId) {
+      return;
+    }
+
+    if (!memberToRemove) {
+      return;
+    }
+
+    if (removeCountdown > 0) {
+      return;
+    }
+
+    try {
+      setProcessingMemberId(memberToRemove.id);
+      await rejectClubMember(clubId, memberToRemove.id);
+      setMembers((currentMembers) =>
+        currentMembers.filter(
+          (currentMember) => currentMember.id !== memberToRemove.id
+        )
+      );
+      closeRemoveModal();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "회원 내보내기에 실패했습니다.");
+    } finally {
+      setProcessingMemberId(null);
+    }
+  };
 
   return (
     <main className={styles.container}>
-
-      {/* 상단 */}
       <header className={styles.header}>
-
         <div className={styles.logoWrap}>
-
-          <img
-            src="/logo.png"
-            alt="동네 로고"
-            className={styles.logo}
-          />
-
-          <span className={styles.logoText}>
-            동네(회장계정)
-          </span>
-
+          <img src="/logo.png" alt="동네 로고" className={styles.logo} />
+          <div>
+            <span className={styles.logoText}>동네(회장계정)</span>
+            <p className={styles.clubName}>{clubName}</p>
+          </div>
         </div>
-
       </header>
 
-      {/* 검색 */}
       <section className={styles.searchSection}>
-
         <div className={styles.searchBar}>
-
-          <button className={styles.backButton}>
+          <button
+            type="button"
+            className={styles.backButton}
+            onClick={() => router.back()}
+          >
             ←
           </button>
 
@@ -155,168 +290,199 @@ export default function ClubPresidentPage() {
             type="text"
             placeholder="사람 이름"
             value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
+            onChange={(event) => setSearch(event.target.value)}
             className={styles.searchInput}
           />
 
-          <button className={styles.searchButton}>
+          <button type="button" className={styles.searchButton} aria-label="검색">
             🔍
           </button>
-
         </div>
-
       </section>
 
-      {/* 탭 */}
       <section className={styles.tabSection}>
-
         <button
-          className={
-            activeTab === "member"
-              ? styles.activeTab
-              : styles.tabButton
-          }
-          onClick={() =>
-            setActiveTab("member")
-          }
+          type="button"
+          className={activeTab === "member" ? styles.activeTab : styles.tabButton}
+          onClick={() => setActiveTab("member")}
         >
           재원목록
         </button>
 
         <button
+          type="button"
           className={
-            activeTab === "applicant"
-              ? styles.activeTab
-              : styles.tabButton
+            activeTab === "applicant" ? styles.activeTab : styles.tabButton
           }
-          onClick={() =>
-            setActiveTab("applicant")
-          }
+          onClick={() => setActiveTab("applicant")}
         >
           신청인원목록
         </button>
-
       </section>
 
-      {/* 회원 목록 */}
+      {isLoading && <p className={styles.statusText}>회원 목록을 불러오는 중입니다.</p>}
+      {error && <p className={styles.statusText}>{error}</p>}
+
+      {!isLoading && !error && filteredMembers.length === 0 && (
+        <p className={styles.statusText}>
+          {activeTab === "member" ? "재원이 없습니다." : "신청 인원이 없습니다."}
+        </p>
+      )}
+
       <section className={styles.memberList}>
+        {filteredMembers.map((member) => {
+          const answers = getApplicantAnswers(member);
+          const extraAnswers = getExtraAnswers(answers);
+          const displayName =
+            activeTab === "applicant"
+              ? getApplicantField(member, answers, "name")
+              : member.name;
+          const displayMajor =
+            activeTab === "applicant"
+              ? getApplicantField(member, answers, "major")
+              : member.major;
+          const displayStudentId =
+            activeTab === "applicant"
+              ? getApplicantField(member, answers, "studentId")
+              : member.studentId;
+          const displayEmail =
+            activeTab === "applicant"
+              ? getApplicantField(member, answers, "email")
+              : member.email;
+          const displayBirth =
+            activeTab === "applicant"
+              ? getApplicantField(member, answers, "birth")
+              : member.birth;
+          const displayPhone =
+            activeTab === "applicant"
+              ? getApplicantField(member, answers, "phone")
+              : member.phone;
 
-        {filteredMembers.map((member) => (
+          return (
+            <div key={member.id} className={styles.memberCard}>
+              <div className={styles.profileImage}>
+                {member.image ? (
+                  <img src={member.image} alt={displayName || member.name} />
+                ) : (
+                  <div className={styles.emptyImage}>✕</div>
+                )}
+              </div>
 
-          <div
-            key={member.id}
-            className={styles.memberCard}
-          >
+              <div className={styles.memberInfo}>
+                <h3>{displayName || "이름 정보 없음"}</h3>
+                <p>{displayMajor || "학과 정보 없음"}</p>
+                {activeTab === "applicant" && (
+                  <p>{displayStudentId || "학번 정보 없음"}</p>
+                )}
+                <p>{displayEmail || "이메일 정보 없음"}</p>
+                <p>{displayBirth || "생년월일 정보 없음"}</p>
+                <p>{displayPhone || "전화번호 정보 없음"}</p>
 
-            {/* 프로필 */}
-            <div className={styles.profileImage}>
+                {activeTab === "applicant" && extraAnswers.length > 0 && (
+                  <dl className={styles.answerList}>
+                    {extraAnswers.map(([label, value]) => (
+                      <div key={label} className={styles.answerItem}>
+                        <dt>{label}</dt>
+                        <dd>{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+              </div>
 
-              {member.image ? (
-                <img
-                  src={member.image}
-                  alt={member.name}
-                />
-              ) : (
-                <div className={styles.emptyImage}>
-                  ✕
+              {activeTab === "applicant" && (
+                <div className={styles.buttonWrap}>
+                  <button
+                    type="button"
+                    className={styles.acceptButton}
+                    disabled={processingMemberId === member.id}
+                    onClick={() => handleAccept(member.id)}
+                  >
+                    수락
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles.rejectButton}
+                    disabled={processingMemberId === member.id}
+                    onClick={() => handleReject(member.id)}
+                  >
+                    거절
+                  </button>
                 </div>
               )}
 
+              {activeTab === "member" && (
+                <div className={styles.buttonWrap}>
+                  <button
+                    type="button"
+                    className={styles.removeButton}
+                    disabled={processingMemberId === member.id}
+                    onClick={() => openRemoveModal(member)}
+                  >
+                    내보내기
+                  </button>
+                </div>
+              )}
             </div>
-
-            {/* 정보 */}
-            <div className={styles.memberInfo}>
-
-              <h3>{member.name}</h3>
-
-              <p>{member.major}</p>
-
-              <p>{member.email}</p>
-
-              <p>{member.birth}</p>
-
-              <p>{member.phone}</p>
-
-            </div>
-
-            {/* 신청목록 버튼 */}
-            {activeTab === "applicant" && (
-
-              <div className={styles.buttonWrap}>
-
-                <button
-                  className={styles.acceptButton}
-                  onClick={() =>
-                    handleAccept(member.id)
-                  }
-                >
-                  수락
-                </button>
-
-                <button
-                  className={styles.rejectButton}
-                  onClick={() =>
-                    handleReject(member.id)
-                  }
-                >
-                  거절
-                </button>
-
-              </div>
-            )}
-
-          </div>
-        ))}
-
+          );
+        })}
       </section>
 
-      {/* 하단 네비게이션 */}
-      <nav className={styles.bottomNav}>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/main")}
-        >
-          <img src="/main.svg" />
-          <p>home</p>
+      {memberToRemove && (
+        <div className={styles.modalOverlay} role="presentation">
+          <section
+            className={styles.confirmModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="remove-member-title"
+          >
+            <strong id="remove-member-title">경고</strong>
+            <p>
+              {memberToRemove.name} 님을 정말 내보내겠습니까?
+            </p>
+            {removeCountdown > 0 && (
+              <small className={styles.countdownText}>
+                {removeCountdown}초 후 내보내기 버튼을 누를 수 있습니다.
+              </small>
+            )}
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.cancelModalButton}
+                disabled={processingMemberId === memberToRemove.id}
+                onClick={closeRemoveModal}
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                className={styles.confirmRemoveButton}
+                disabled={
+                  processingMemberId === memberToRemove.id || removeCountdown > 0
+                }
+                onClick={handleRemoveMember}
+              >
+                {processingMemberId === memberToRemove.id
+                  ? "처리 중"
+                  : removeCountdown > 0
+                    ? `${removeCountdown}초`
+                    : "내보내기"}
+              </button>
+            </div>
+          </section>
         </div>
+      )}
 
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/clubs")}
-        >
-          <img src="/clubs.svg" />
-          <p>clubs</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/events")}
-        >
-          <img src="/events.svg" />
-          <p>events</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/apply")}
-        >
-          <img src="/apply.svg" />
-          <p>apply</p>
-        </div>
-
-        <div
-          className={styles.navItem}
-          onClick={() => router.push("/mypage")}
-        >
-          <img src="/mypage.svg" />
-          <p>mypage</p>
-        </div>
-
-      </nav>
-
+      <BottomNav />
     </main>
+  );
+}
+
+export default function ClubPresidentPage() {
+  return (
+    <Suspense fallback={null}>
+      <ClubPresidentContent />
+    </Suspense>
   );
 }

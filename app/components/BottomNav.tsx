@@ -8,7 +8,7 @@ const navItems = [
   { href: "/main", icon: "/main.svg", label: "home" },
   { href: "/clubs", icon: "/clubs.svg", label: "clubs" },
   { href: "/events", icon: "/events.svg", label: "events" },
-  { href: "/joined", icon: "/apply.svg", label: "joined" },
+  { href: "/myclub", icon: "/apply.svg", label: "myclub" },
   { href: "/mypage", icon: "/mypage.svg", label: "mypage" },
 ];
 
