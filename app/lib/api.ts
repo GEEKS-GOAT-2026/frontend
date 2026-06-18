@@ -98,11 +98,15 @@ export type ApplicationResponse = {
 
 export type ClubMember = {
   id: number;
+  applicationId?: number | null;
+  clubMemberId?: number | null;
   name: string;
-  major: string | null;
+  major?: string | null;
   studentId?: string | null;
+  studentNumber?: string | null;
+  department?: string | null;
   email: string;
-  birth: string | null;
+  birth?: string | null;
   phone: string | null;
   image: string | null;
   status: "member" | "applicant" | "rejected" | "left" | string;
@@ -262,6 +266,29 @@ export function getEvents({
   );
 }
 
+export function createEvent(
+  clubId: number,
+  event: {
+    title: string;
+    description: string;
+    eventDate: string;
+    location: string;
+    imageUrl?: string;
+    published?: boolean;
+  }
+) {
+  return apiFetch<ClubEvent>(
+    "/api/events",
+    {
+      method: "POST",
+      body: JSON.stringify(event),
+    },
+    {
+      clubId: String(clubId),
+    }
+  );
+}
+
 export function getRecentEvents({ size = 3 }: RecentEventParams = {}) {
   return apiFetch<ClubEvent[]>(
     "/api/events/recent",
@@ -284,12 +311,48 @@ export function getMyApplications() {
   return apiFetch<ApplicationResponse[]>("/api/applications/me");
 }
 
+export function getClubApplications(clubId: number) {
+  return apiFetch<ApplicationResponse[]>(`/api/clubs/${clubId}/applications`);
+}
+
 export function getClubActivityRecords(clubId: number) {
   return apiFetch<ClubActivityRecord[]>(`/api/clubs/${clubId}/activities`);
 }
 
+export function createClubActivityRecord(
+  clubId: number,
+  activity: {
+    title: string;
+    description: string;
+    startDate: string;
+    endDate: string;
+    imageUrl?: string;
+  }
+) {
+  return apiFetch<ClubActivityRecord>(`/api/clubs/${clubId}/activities`, {
+    method: "POST",
+    body: JSON.stringify(activity),
+  });
+}
+
 export function getClubNotices(clubId: number) {
   return apiFetch<ClubNotice[]>(`/api/clubs/${clubId}/notices`);
+}
+
+export function createClubNotice(
+  clubId: number,
+  notice: {
+    title: string;
+    content: string;
+    noticeDate: string;
+    badge?: string;
+    pinned?: boolean;
+  }
+) {
+  return apiFetch<ClubNotice>(`/api/clubs/${clubId}/notices`, {
+    method: "POST",
+    body: JSON.stringify(notice),
+  });
 }
 
 export function getClubMembers(
@@ -335,6 +398,13 @@ export function transferPresident(clubId: number, targetEmail: string) {
 export function acceptClubMember(clubId: number, memberId: number) {
   return apiFetch<ClubMember>(`/api/clubs/${clubId}/members/${memberId}/accept`, {
     method: "PATCH",
+  });
+}
+
+export function updateApplicationStatus(applicationId: number, status: string) {
+  return apiFetch<ApplicationResponse>(`/api/applications/${applicationId}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
   });
 }
 

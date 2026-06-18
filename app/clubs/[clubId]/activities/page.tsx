@@ -76,7 +76,19 @@ export default function ClubActivitiesPage() {
 
       <section className={styles.activityList} aria-label="동아리 활동기록 목록">
         {activities.map((activity) => (
-          <article key={activity.id} className={styles.activityCard}>
+          <article
+            key={activity.id}
+            className={styles.activityCard}
+            role="button"
+            tabIndex={0}
+            onClick={() => router.push(`/clubs/${clubId}/activities/${activity.id}`)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                router.push(`/clubs/${clubId}/activities/${activity.id}`);
+              }
+            }}
+          >
             <div className={styles.activityImage}>
               {activity.imageUrl && <img src={activity.imageUrl} alt={`${activity.title} 이미지`} />}
             </div>

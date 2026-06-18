@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import BottomNav from "../components/BottomNav";
 import { ClubEvent, getEvents } from "../lib/api";
@@ -9,6 +9,7 @@ import { ClubEvent, getEvents } from "../lib/api";
 import styles from "./page.module.css";
 
 function EventsContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const clubIdParam = searchParams.get("clubId");
   const clubName = searchParams.get("clubName") ?? "";
@@ -51,7 +52,19 @@ function EventsContent() {
 
       <section className={styles.list}>
         {events.map((event) => (
-          <article key={event.id} className={styles.card}>
+          <article
+            key={event.id}
+            className={styles.card}
+            role="button"
+            tabIndex={0}
+            onClick={() => router.push(`/events/${event.id}?clubId=${event.clubId}`)}
+            onKeyDown={(keyboardEvent) => {
+              if (keyboardEvent.key === "Enter" || keyboardEvent.key === " ") {
+                keyboardEvent.preventDefault();
+                router.push(`/events/${event.id}?clubId=${event.clubId}`);
+              }
+            }}
+          >
             <p className={styles.meta}>{event.clubName}</p>
             <h2>{event.title}</h2>
             <p>{event.description}</p>

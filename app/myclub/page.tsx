@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import BottomNav from "../components/BottomNav";
 import ClubCard from "../components/ClubCard";
 import SearchHeader from "../components/SearchHeader";
-import { Club, getJoinedClubs } from "../lib/api";
+import { Club, getClub, getJoinedClubs, getMyInfo } from "../lib/api";
 
 import styles from "./page.module.css";
 
@@ -14,6 +14,44 @@ function getClubTags(club: Club) {
   return [club.category, club.recruitmentDisplayText]
     .filter(Boolean)
     .map((tag) => `#${tag}`);
+}
+
+async function getMyClubsForView() {
+  const [joinedResult, userResult] = await Promise.allSettled([
+    getJoinedClubs(),
+    getMyInfo(),
+  ]);
+
+  if (joinedResult.status === "rejected" && userResult.status === "rejected") {
+    throw joinedResult.reason;
+  }
+
+  const clubMap = new Map<number, Club>();
+  const joinedClubs = joinedResult.status === "fulfilled" ? joinedResult.value : [];
+  const managedClubs =
+    userResult.status === "fulfilled" ? userResult.value.managedClubs ?? [] : [];
+
+  joinedClubs.forEach((club) => {
+    clubMap.set(club.id, club);
+  });
+
+  const missingManagedClubIds = managedClubs
+    .map((club) => club.clubId)
+    .filter((clubId) => !clubMap.has(clubId));
+
+  const managedClubDetails = await Promise.allSettled(
+    missingManagedClubIds.map((clubId) => getClub(clubId))
+  );
+
+  managedClubDetails.forEach((result) => {
+    if (result.status === "fulfilled") {
+      clubMap.set(result.value.id, result.value);
+    }
+  });
+
+  return Array.from(clubMap.values()).sort((first, second) =>
+    first.name.localeCompare(second.name, "ko")
+  );
 }
 
 export default function MyClubPage() {
@@ -28,7 +66,7 @@ export default function MyClubPage() {
       try {
         setIsLoading(true);
         setError("");
-        const data = await getJoinedClubs();
+        const data = await getMyClubsForView();
         setClubs(data);
       } catch (err) {
         setError(

@@ -102,7 +102,9 @@ export default function ClubApplyPage() {
       setIsSubmitting(true);
       await submitApplication(activeRecruitment.id, {
         name: form.name.trim(),
+        department: form.major.trim(),
         major: form.major.trim(),
+        studentNumber: form.studentId.trim(),
         studentId: form.studentId.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),

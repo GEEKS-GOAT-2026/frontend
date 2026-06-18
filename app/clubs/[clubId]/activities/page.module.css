@@ -58,6 +58,7 @@
   background: #fff;
   padding: 10px 14px;
   box-shadow: 2px 4px 6px rgba(47, 71, 95, 0.28);
+  cursor: pointer;
 }
 
 .activityImage {

@@ -5,11 +5,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import BottomNav from "../components/BottomNav";
 import {
+  ApplicationResponse,
   ClubMember,
   acceptClubMember,
+  getClubApplications,
   getClubMembers,
   getMyInfo,
   rejectClubMember,
+  updateApplicationStatus,
 } from "../lib/api";
 
 import styles from "./page.module.css";
@@ -30,6 +33,22 @@ function getApplicantAnswers(member: ClubMember) {
     member.application?.answers ??
     {}
   );
+}
+
+function getAnswerValue(
+  answers: Record<string, unknown>,
+  keys: string[],
+  fallback = ""
+) {
+  for (const key of keys) {
+    const value = getAnswerText(answers, key);
+
+    if (value) {
+      return value;
+    }
+  }
+
+  return fallback;
 }
 
 function getAnswerText(
@@ -59,8 +78,21 @@ function getApplicantField(
   answers: Record<string, unknown>,
   key: "name" | "major" | "studentId" | "email" | "birth" | "phone"
 ) {
-  const memberValue = member[key];
-  const answerValue = getAnswerText(answers, key);
+  const memberValue =
+    key === "major"
+      ? member.department || member.major
+      : key === "studentId"
+        ? member.studentNumber || member.studentId
+        : member[key];
+  const answerKeys: Record<typeof key, string[]> = {
+    name: ["name"],
+    major: ["department", "major"],
+    studentId: ["studentNumber", "student_number", "studentId"],
+    email: ["email"],
+    birth: ["birth"],
+    phone: ["phone"],
+  };
+  const answerValue = getAnswerValue(answers, answerKeys[key]);
 
   return answerValue || memberValue || "";
 }
@@ -69,7 +101,10 @@ function getAnswerLabel(key: string) {
   const labels: Record<string, string> = {
     name: "신청자 이름",
     major: "학과",
+    department: "학과",
     studentId: "학번",
+    studentNumber: "학번",
+    student_number: "학번",
     email: "이메일",
     birth: "생년월일",
     phone: "전화번호",
@@ -83,7 +118,10 @@ function getExtraAnswers(answers: Record<string, unknown>) {
   const primaryKeys = new Set([
     "name",
     "major",
+    "department",
     "studentId",
+    "studentNumber",
+    "student_number",
     "email",
     "birth",
     "phone",
@@ -93,6 +131,46 @@ function getExtraAnswers(answers: Record<string, unknown>) {
     .filter(([key, value]) => !primaryKeys.has(key) && value !== null && value !== "")
     .map(([key]) => [getAnswerLabel(key), getAnswerText(answers, key)] as const)
     .filter(([, value]) => value);
+}
+
+function isPendingApplication(application: ApplicationResponse) {
+  return application.status.toUpperCase() === "PENDING";
+}
+
+function applicationToMember(
+  application: ApplicationResponse,
+  applicantMember?: ClubMember
+): ClubMember {
+  const answers = application.answers ?? {};
+
+  return {
+    id: applicantMember?.id ?? application.id,
+    applicationId: application.id,
+    clubMemberId: applicantMember?.id ?? null,
+    name: getAnswerValue(answers, ["name"], applicantMember?.name ?? application.userName),
+    major: getAnswerValue(answers, ["department", "major"]),
+    department: getAnswerValue(
+      answers,
+      ["department", "major"],
+      applicantMember?.department ?? applicantMember?.major ?? ""
+    ),
+    studentId: getAnswerValue(answers, [
+      "studentNumber",
+      "student_number",
+      "studentId",
+    ], applicantMember?.studentNumber ?? applicantMember?.studentId ?? ""),
+    studentNumber: getAnswerValue(answers, [
+      "studentNumber",
+      "student_number",
+      "studentId",
+    ], applicantMember?.studentNumber ?? applicantMember?.studentId ?? ""),
+    email: getAnswerValue(answers, ["email"], applicantMember?.email ?? application.userEmail),
+    birth: getAnswerValue(answers, ["birth"], applicantMember?.birth ?? ""),
+    phone: getAnswerValue(answers, ["phone"], applicantMember?.phone ?? ""),
+    image: applicantMember?.image ?? null,
+    status: application.status,
+    answers,
+  };
 }
 
 function ClubPresidentContent() {
@@ -149,6 +227,41 @@ function ClubPresidentContent() {
       try {
         setIsLoading(true);
         setError("");
+
+        if (activeTab === "applicant") {
+          const [applications, applicantMembers] = await Promise.all([
+            getClubApplications(clubId),
+            getClubMembers(clubId, {
+              status: "applicant",
+              keyword: "",
+            }),
+          ]);
+          const applicantMemberMap = new Map(
+            applicantMembers.map((member) => [member.email.toLowerCase(), member])
+          );
+          const keyword = search.trim().toLowerCase();
+          const applicants = applications
+            .filter(isPendingApplication)
+            .map((application) =>
+              applicationToMember(
+                application,
+                applicantMemberMap.get(application.userEmail.toLowerCase())
+              )
+            )
+            .filter((applicant) => {
+              if (!keyword) {
+                return true;
+              }
+
+              return [applicant.name, applicant.department, applicant.email, applicant.phone]
+                .filter(Boolean)
+                .some((value) => value?.toLowerCase().includes(keyword));
+            });
+
+          setMembers(applicants);
+          return;
+        }
+
         const data = await getClubMembers(clubId, {
           status: activeTab,
           keyword: search.trim(),
@@ -204,9 +317,21 @@ function ClubPresidentContent() {
       return;
     }
 
+    const targetMember = members.find((member) => member.id === memberId);
+    const applicationId = targetMember?.applicationId ?? memberId;
+    const clubMemberId = targetMember?.clubMemberId ?? memberId;
+
     try {
       setProcessingMemberId(memberId);
-      await acceptClubMember(clubId, memberId);
+      if (activeTab === "applicant") {
+        if (!targetMember?.clubMemberId) {
+          throw new Error("신청자 회원 정보를 찾지 못했습니다.");
+        }
+        await updateApplicationStatus(applicationId, "ACCEPTED");
+        await acceptClubMember(clubId, clubMemberId);
+      } else {
+        await acceptClubMember(clubId, memberId);
+      }
       setMembers((currentMembers) =>
         currentMembers.filter((member) => member.id !== memberId)
       );
@@ -222,9 +347,21 @@ function ClubPresidentContent() {
       return;
     }
 
+    const targetMember = members.find((member) => member.id === memberId);
+    const applicationId = targetMember?.applicationId ?? memberId;
+    const clubMemberId = targetMember?.clubMemberId ?? memberId;
+
     try {
       setProcessingMemberId(memberId);
-      await rejectClubMember(clubId, memberId);
+      if (activeTab === "applicant") {
+        if (!targetMember?.clubMemberId) {
+          throw new Error("신청자 회원 정보를 찾지 못했습니다.");
+        }
+        await updateApplicationStatus(applicationId, "REJECTED");
+        await rejectClubMember(clubId, clubMemberId);
+      } else {
+        await rejectClubMember(clubId, memberId);
+      }
       setMembers((currentMembers) =>
         currentMembers.filter((member) => member.id !== memberId)
       );
@@ -340,11 +477,11 @@ function ClubPresidentContent() {
           const displayMajor =
             activeTab === "applicant"
               ? getApplicantField(member, answers, "major")
-              : member.major;
+              : member.department || member.major;
           const displayStudentId =
             activeTab === "applicant"
               ? getApplicantField(member, answers, "studentId")
-              : member.studentId;
+              : member.studentNumber || member.studentId;
           const displayEmail =
             activeTab === "applicant"
               ? getApplicantField(member, answers, "email")
@@ -371,11 +508,11 @@ function ClubPresidentContent() {
               <div className={styles.memberInfo}>
                 <h3>{displayName || "이름 정보 없음"}</h3>
                 <p>{displayMajor || "학과 정보 없음"}</p>
-                {activeTab === "applicant" && (
-                  <p>{displayStudentId || "학번 정보 없음"}</p>
-                )}
+                <p>{displayStudentId || "학번 정보 없음"}</p>
                 <p>{displayEmail || "이메일 정보 없음"}</p>
-                <p>{displayBirth || "생년월일 정보 없음"}</p>
+                {activeTab === "applicant" && (
+                  <p>{displayBirth || "생년월일 정보 없음"}</p>
+                )}
                 <p>{displayPhone || "전화번호 정보 없음"}</p>
 
                 {activeTab === "applicant" && extraAnswers.length > 0 && (

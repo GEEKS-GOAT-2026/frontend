@@ -266,6 +266,68 @@
   line-height: 1.5;
 }
 
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(20, 50, 80, 0.34);
+}
+
+.manageModal {
+  width: min(100%, 280px);
+  border-radius: 12px;
+  background: #fff;
+  padding: 22px 18px 18px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.manageModal h2 {
+  color: #0050c8;
+  font-size: 18px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.manageModal p {
+  color: #456;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.manageModalActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.manageModalActions button,
+.closeModalButton {
+  min-height: 42px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.manageModalActions button {
+  background: #0072d6;
+  color: #fff;
+}
+
+.closeModalButton {
+  width: 100%;
+  background: #e4e4e4;
+  color: #555;
+}
+
 @media (max-width: 360px) {
   .summaryCard {
     gap: 12px;

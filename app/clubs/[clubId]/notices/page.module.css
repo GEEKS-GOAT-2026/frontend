@@ -45,11 +45,16 @@
 .noticeCard {
   display: flex;
   align-items: center;
+  width: 100%;
   min-height: 48px;
+  border: none;
   border-radius: 12px;
   background: #fff;
   padding: 9px 12px;
   box-shadow: 2px 4px 6px rgba(47, 71, 95, 0.28);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .badgeSlot {

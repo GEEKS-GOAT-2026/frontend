@@ -103,6 +103,7 @@ export default function ClubDetailPage() {
   const [isJoined, setIsJoined] = useState(false);
   const [isApplicationPending, setIsApplicationPending] = useState(false);
   const [isClubPresident, setIsClubPresident] = useState(false);
+  const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -174,7 +175,15 @@ export default function ClubDetailPage() {
   };
 
   const handleManageClick = () => {
+    setIsManageModalOpen(true);
+  };
+
+  const handleMemberManageClick = () => {
     router.push(`/clubpresidentpage?clubId=${clubId}`);
+  };
+
+  const handleWriteClick = () => {
+    router.push(`/clubpresidentpage/write?clubId=${clubId}`);
   };
 
   return (
@@ -283,6 +292,42 @@ export default function ClubDetailPage() {
             </button>
           ) : null}
         </>
+      )}
+
+      {isManageModalOpen && (
+        <div
+          className={styles.modalOverlay}
+          role="presentation"
+          onClick={() => setIsManageModalOpen(false)}
+        >
+          <section
+            className={styles.manageModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="manage-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="manage-modal-title">동아리 관리</h2>
+            <p>관리할 메뉴를 선택하세요.</p>
+
+            <div className={styles.manageModalActions}>
+              <button type="button" onClick={handleMemberManageClick}>
+                인원관리
+              </button>
+              <button type="button" onClick={handleWriteClick}>
+                글쓰기
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className={styles.closeModalButton}
+              onClick={() => setIsManageModalOpen(false)}
+            >
+              닫기
+            </button>
+          </section>
+        </div>
       )}
 
       <BottomNav />

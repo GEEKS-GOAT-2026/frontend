@@ -70,7 +70,12 @@ export default function ClubNoticesPage() {
 
       <section className={styles.noticeList} aria-label="동아리 공지사항 목록">
         {notices.map((notice) => (
-          <article key={notice.id} className={styles.noticeCard}>
+          <button
+            key={notice.id}
+            type="button"
+            className={styles.noticeCard}
+            onClick={() => router.push(`/clubs/${clubId}/notices/${notice.id}`)}
+          >
             <div className={styles.badgeSlot}>
               {notice.badge && (
                 <span className={notice.pinned ? styles.importantBadge : styles.newBadge}>
@@ -89,7 +94,7 @@ export default function ClubNoticesPage() {
             <span className={styles.chevron} aria-hidden="true">
               ›
             </span>
-          </article>
+          </button>
         ))}
       </section>
 

@@ -1,0 +1,156 @@
+.container {
+  min-height: 100vh;
+  background: #8dbee4;
+  padding: 22px 14px 116px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.backButton {
+  width: 26px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  color: #0057c2;
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.header h1 {
+  color: #0057c2;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.header p {
+  color: #0057c2;
+  font-size: 11px;
+  font-weight: 800;
+  margin-top: 3px;
+}
+
+.intro {
+  margin-bottom: 22px;
+}
+
+.intro strong {
+  display: block;
+  color: #111;
+  font-size: 14px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.intro p {
+  max-width: 260px;
+  color: #174568;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.optionList {
+  display: grid;
+  gap: 16px;
+}
+
+.optionCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 94px;
+  border-radius: 12px;
+  background: #fff;
+  padding: 14px;
+  box-shadow: 2px 4px 6px rgba(47, 71, 95, 0.22);
+}
+
+.optionContent {
+  min-width: 0;
+  flex: 1;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 22px;
+  border-radius: 999px;
+  background: #d8f2ff;
+  color: #0090d2;
+  font-size: 10px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.optionCard h2 {
+  color: #111;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 5px;
+}
+
+.optionCard p {
+  color: #345;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.selectButton {
+  width: 54px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: #0057c2;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  flex-shrink: 0;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 80, 200, 0.22);
+}
+
+.tipBox {
+  display: flex;
+  gap: 12px;
+  margin-top: 26px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 16px 14px;
+}
+
+.tipBox strong {
+  color: #0057c2;
+  font-size: 12px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.tipBox p {
+  color: #174568;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+@media (max-width: 360px) {
+  .optionCard {
+    padding: 12px;
+  }
+
+  .selectButton {
+    width: 48px;
+  }
+}

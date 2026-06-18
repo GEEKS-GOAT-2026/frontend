@@ -1,0 +1,247 @@
+.container {
+  min-height: 100vh;
+  background: #8dbee4;
+  padding: 22px 14px 116px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.backButton {
+  width: 26px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  color: #0057c2;
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.header h1 {
+  color: #0057c2;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.header p {
+  color: #0057c2;
+  font-size: 11px;
+  font-weight: 800;
+  margin-top: 3px;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+}
+
+.modeTabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.modeTabs span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.38);
+  color: #5080a8;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.modeTabs .activeTab {
+  background: #0057c2;
+  color: #fff;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field span,
+.uploadBox span {
+  color: #0057c2;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border: none;
+  border-radius: 9px;
+  background: #fff;
+  color: #122;
+  font-size: 13px;
+  font-weight: 700;
+  outline: none;
+  box-shadow: 1px 3px 5px rgba(47, 71, 95, 0.14);
+}
+
+.field input {
+  height: 48px;
+  padding: 0 16px;
+}
+
+.field textarea {
+  min-height: 118px;
+  resize: none;
+  padding: 16px;
+  line-height: 1.45;
+}
+
+.field input::placeholder,
+.field textarea::placeholder,
+.field textarea::placeholder {
+  color: #8aa0b0;
+}
+
+.uploadBox {
+  display: grid;
+  gap: 6px;
+}
+
+.imagePicker {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 104px;
+  overflow: hidden;
+  border-radius: 9px;
+  border: 1.5px dashed #4e9ed3;
+  background: rgba(255, 255, 255, 0.24);
+  color: #0057c2;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 1px 3px 5px rgba(47, 71, 95, 0.14);
+}
+
+.imagePicker strong {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.imagePicker img {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+}
+
+.imagePicker input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.filePicker {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 58px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #fff;
+  color: #8aa0b0;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 1px 3px 5px rgba(47, 71, 95, 0.14);
+}
+
+.filePicker strong {
+  width: 100%;
+  padding: 0 16px;
+  color: #8aa0b0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.filePicker input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.imageMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.45);
+  padding: 8px 10px;
+}
+
+.imageMeta span {
+  min-width: 0;
+  overflow: hidden;
+  color: #174568;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.imageMeta button {
+  border: none;
+  border-radius: 999px;
+  background: #fff;
+  color: #0057c2;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.actionRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.draftButton,
+.previewButton,
+.submitButton {
+  height: 46px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.draftButton {
+  background: #fff;
+  color: #0057c2;
+}
+
+.previewButton,
+.submitButton {
+  background: #0057c2;
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 80, 200, 0.22);
+}
+
+.submitButton {
+  margin-top: 2px;
+}
+
+.submitButton:disabled {
+  background: #7aa8ca;
+  cursor: not-allowed;
+  box-shadow: none;
+}
