@@ -418,6 +418,7 @@ export async function uploadClubImageForPost(
 
   const formData = new FormData();
 
+  formData.append("clubId", String(clubId));
   formData.append("file", file);
   formData.append("type", type);
 
