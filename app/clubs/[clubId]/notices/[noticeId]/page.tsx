@@ -102,6 +102,12 @@ export default function NoticeDetailPage() {
       {!isLoading && !error && notice && (
         <>
           <article className={styles.noticePanel}>
+            {notice.imageUrl && (
+              <div className={styles.heroImage}>
+                <img src={notice.imageUrl} alt={`${notice.title} 이미지`} />
+              </div>
+            )}
+
             <div className={styles.badgeRow}>
               <span className={styles.badge}>{notice.badge || "중요"}</span>
               {notice.pinned && <span className={styles.softBadge}>상단 고정</span>}

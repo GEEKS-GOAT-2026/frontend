@@ -37,6 +37,20 @@
   box-shadow: 2px 4px 6px rgba(47, 71, 95, 0.18);
 }
 
+.heroImage {
+  overflow: hidden;
+  border-radius: 10px;
+  background: #e9f5ff;
+  margin-bottom: 16px;
+}
+
+.heroImage img {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+}
+
 .badgeRow {
   display: flex;
   align-items: center;

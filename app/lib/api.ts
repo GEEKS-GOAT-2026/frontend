@@ -75,6 +75,14 @@ export type ClubNotice = {
   noticeDate: string;
   badge: string | null;
   pinned: boolean;
+  imageUrl: string | null;
+};
+
+export type ClubImageType = "PROFILE" | "EVENT" | "ACTIVITY" | "NOTICE";
+
+export type ClubImageUploadResponse = {
+  imageUrl: string;
+  path: string;
 };
 
 export type ManagedClub = {
@@ -347,12 +355,114 @@ export function createClubNotice(
     noticeDate: string;
     badge?: string;
     pinned?: boolean;
+    imageUrl?: string | null;
   }
 ) {
   return apiFetch<ClubNotice>(`/api/clubs/${clubId}/notices`, {
     method: "POST",
     body: JSON.stringify(notice),
   });
+}
+
+export async function uploadClubImage(
+  clubId: number,
+  file: File,
+  type: ClubImageType
+) {
+  const token = getAccessToken();
+  const formData = new FormData();
+
+  formData.append("clubId", String(clubId));
+  formData.append("file", file);
+  formData.append("type", type);
+
+  let response: Response;
+
+  try {
+    response = await fetch(buildUrl(`/api/clubs/${clubId}/images`), {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+  } catch {
+    throw new Error(
+      "이미지 업로드 서버에 연결하지 못했습니다. 백엔드 배포에 이미지 업로드 API가 반영됐는지 확인해주세요."
+    );
+  }
+
+  if (response.status === 401) {
+    clearAuthToken();
+    throw new Error("로그인이 필요합니다.");
+  }
+
+  if (!response.ok) {
+    throw new Error(`이미지 업로드 실패: ${response.status}`);
+  }
+
+  return response.json() as Promise<ClubImageUploadResponse>;
+}
+
+export async function uploadClubImageForPost(
+  clubId: number,
+  file: File,
+  type: ClubImageType
+) {
+  const token = getAccessToken();
+
+  if (!token) {
+    throw new Error("로그인이 필요합니다.");
+  }
+
+  const formData = new FormData();
+
+  formData.append("file", file);
+  formData.append("type", type);
+
+  let response: Response;
+
+  try {
+    response = await fetch("/api/club-image-upload", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+  } catch {
+    throw new Error(
+      "이미지 업로드 서버에 연결하지 못했습니다. 배포 API에 이미지 업로드 기능이 반영됐는지 확인해주세요."
+    );
+  }
+
+  if (response.type === "opaqueredirect" || response.status === 0) {
+    clearAuthToken();
+    throw new Error("로그인이 만료되었습니다. 다시 로그인해주세요.");
+  }
+
+  if (response.status === 401) {
+    clearAuthToken();
+    throw new Error("로그인이 필요합니다.");
+  }
+
+  if (response.status >= 300 && response.status < 400) {
+    clearAuthToken();
+    throw new Error("로그인이 만료되었습니다. 다시 로그인해주세요.");
+  }
+
+  if (response.status === 404) {
+    throw new Error(
+      "이미지 업로드 API를 찾을 수 없습니다. 배포 API에 /api/clubs/{clubId}/images 경로가 필요합니다."
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(`이미지 업로드 실패: ${response.status}`);
+  }
+
+  return response.json() as Promise<ClubImageUploadResponse>;
 }
 
 export function getClubMembers(
