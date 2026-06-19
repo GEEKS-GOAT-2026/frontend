@@ -1,0 +1,135 @@
+.container {
+  min-height: 100vh;
+  background: #8dbee4;
+  padding: 24px 14px 112px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.backButton {
+  width: 28px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: #0050c8;
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.header h1 {
+  color: #0050c8;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.header p {
+  color: #0050c8;
+  font-size: 11px;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.searchSection {
+  margin-bottom: 16px;
+}
+
+.searchSection input {
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: #fff;
+  color: #123;
+  font-size: 13px;
+  font-weight: 700;
+  outline: none;
+  padding: 0 16px;
+  box-shadow: 1px 3px 5px rgba(47, 71, 95, 0.14);
+}
+
+.memberList {
+  display: grid;
+  gap: 12px;
+}
+
+.memberCard {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 12px;
+  border-radius: 12px;
+  background: #fff;
+  padding: 14px;
+  box-shadow: 2px 4px 7px rgba(47, 71, 95, 0.22);
+}
+
+.profileImage {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #dff2ff;
+  color: #0050c8;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.profileImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.memberInfo {
+  min-width: 0;
+}
+
+.memberInfo h2 {
+  color: #1d2730;
+  font-size: 16px;
+  font-weight: 900;
+  margin-bottom: 5px;
+}
+
+.memberInfo p {
+  overflow: hidden;
+  color: #405467;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transferButton {
+  grid-column: 1 / -1;
+  min-height: 42px;
+  border: none;
+  border-radius: 8px;
+  background: #0050c8;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.transferButton:disabled {
+  background: #7aa8ca;
+  cursor: not-allowed;
+}
+
+.statusText {
+  color: #174568;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import BottomNav from "../../components/BottomNav";
 import {
@@ -9,7 +10,6 @@ import {
   getJoinedClubs,
   getMyInfo,
   leaveMyClub,
-  transferPresident,
 } from "../../lib/api";
 
 import styles from "./page.module.css";
@@ -93,6 +93,7 @@ async function fetchMyClubManagementData() {
 }
 
 export default function MyClubManagePage() {
+  const router = useRouter();
   const [joinedClubs, setJoinedClubs] = useState<Club[]>([]);
   const [managedClubs, setManagedClubs] = useState<ManagedClub[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -127,31 +128,10 @@ export default function MyClubManagePage() {
     [joinedClubs, managedClubs]
   );
 
-  const handleTransfer = async (club: ManagedClubItem) => {
-    const targetEmail = window.prompt(
-      `${club.name} 회장 권한을 넘겨받을 회원의 이메일을 입력하세요.`
+  const handleTransfer = (club: ManagedClubItem) => {
+    router.push(
+      `/myclub/manage/transfer?clubId=${club.id}&clubName=${encodeURIComponent(club.name)}`
     );
-
-    if (!targetEmail?.trim()) {
-      return;
-    }
-
-    try {
-      setProcessingClubId(club.id);
-      await transferPresident(club.id, targetEmail.trim());
-      alert("회장 계정 양도가 완료되었습니다.");
-      const data = await fetchMyClubManagementData();
-      setJoinedClubs(data.joinedClubs);
-      setManagedClubs(data.managedClubs);
-    } catch (err) {
-      alert(
-        err instanceof Error
-          ? err.message
-          : "회장 계정 양도에 실패했습니다."
-      );
-    } finally {
-      setProcessingClubId(null);
-    }
   };
 
   const handleLeave = async (club: ManagedClubItem) => {
@@ -181,7 +161,7 @@ export default function MyClubManagePage() {
   return (
     <main className={styles.container}>
       <h1 className={styles.title}>나의 동아리 관리</h1>
-      <p className={styles.subtitle}>가입 동아리를 확인하고 관리하세요.</p>
+      <p className={styles.subtitle}>가입한 동아리를 확인하고 관리해요.</p>
 
       {isLoading && <p className={styles.statusText}>동아리 정보를 불러오는 중입니다.</p>}
       {error && <p className={styles.statusText}>{error}</p>}
@@ -191,7 +171,7 @@ export default function MyClubManagePage() {
       )}
 
       {!isLoading && !error && clubs.length > 0 && (
-        <section className={styles.list} aria-label="내 동아리 관리 목록">
+        <section className={styles.list} aria-label="나의 동아리 관리 목록">
           {clubs.map((club) => {
             const isPresident = club.role === "president";
 
@@ -224,7 +204,7 @@ export default function MyClubManagePage() {
                   {processingClubId === club.id
                     ? "처리 중"
                     : isPresident
-                      ? "회장 계정 양도"
+                      ? "회장 권한 양도"
                       : "탈퇴하기"}
                 </button>
               </article>
