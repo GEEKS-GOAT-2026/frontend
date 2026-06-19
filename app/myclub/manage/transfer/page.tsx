@@ -52,6 +52,8 @@ function TransferPresidentContent() {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [processingMemberId, setProcessingMemberId] = useState<number | null>(null);
+  const [memberToTransfer, setMemberToTransfer] = useState<ClubMember | null>(null);
+  const [transferCountdown, setTransferCountdown] = useState(0);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -98,6 +100,25 @@ function TransferPresidentContent() {
     void loadMembers();
   }, [clubId]);
 
+  useEffect(() => {
+    if (!memberToTransfer) {
+      return;
+    }
+
+    const timerId = window.setInterval(() => {
+      setTransferCountdown((currentCount) => {
+        if (currentCount <= 1) {
+          window.clearInterval(timerId);
+          return 0;
+        }
+
+        return currentCount - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(timerId);
+  }, [memberToTransfer]);
+
   const filteredMembers = useMemo(() => {
     const keyword = search.trim().toLowerCase();
 
@@ -120,28 +141,31 @@ function TransferPresidentContent() {
       });
   }, [members, myEmail, search]);
 
-  const handleTransfer = async (member: ClubMember) => {
-    if (!clubId) {
-      return;
-    }
+  const openTransferModal = (member: ClubMember) => {
+    setTransferCountdown(3);
+    setMemberToTransfer(member);
+  };
 
-    const confirmed = window.confirm(
-      `${member.name} 회원에게 ${clubName} 회장 권한을 양도하시겠습니까?`
-    );
+  const closeTransferModal = () => {
+    setMemberToTransfer(null);
+    setTransferCountdown(0);
+  };
 
-    if (!confirmed) {
+  const handleTransfer = async () => {
+    if (!clubId || !memberToTransfer || transferCountdown > 0) {
       return;
     }
 
     try {
-      setProcessingMemberId(member.id);
-      await transferPresident(clubId, member.email);
+      setProcessingMemberId(memberToTransfer.id);
+      await transferPresident(clubId, memberToTransfer.email);
       alert("회장 권한 양도가 완료되었습니다.");
       router.replace("/myclub/manage");
     } catch (err) {
       alert(err instanceof Error ? err.message : "회장 권한 양도에 실패했습니다.");
     } finally {
       setProcessingMemberId(null);
+      closeTransferModal();
     }
   };
 
@@ -200,13 +224,63 @@ function TransferPresidentContent() {
               type="button"
               className={styles.transferButton}
               disabled={processingMemberId === member.id || !member.email}
-              onClick={() => handleTransfer(member)}
+              onClick={() => openTransferModal(member)}
             >
               {processingMemberId === member.id ? "양도 중" : "양도하기"}
             </button>
           </article>
         ))}
       </section>
+
+      {memberToTransfer && (
+        <div className={styles.modalOverlay} role="presentation">
+          <section
+            className={styles.confirmModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="transfer-president-title"
+          >
+            <strong id="transfer-president-title">회장 권한 양도</strong>
+            <p>
+              {memberToTransfer.name} 회원에게 {clubName} 회장 권한을 정말
+              양도하시겠습니까?
+            </p>
+            <small className={styles.warningText}>
+              양도 후 현재 계정은 회장 권한을 잃게 됩니다.
+            </small>
+            {transferCountdown > 0 && (
+              <small className={styles.countdownText}>
+                {transferCountdown}초 후 양도하기 버튼을 누를 수 있습니다.
+              </small>
+            )}
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.cancelModalButton}
+                disabled={processingMemberId === memberToTransfer.id}
+                onClick={closeTransferModal}
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                className={styles.confirmTransferButton}
+                disabled={
+                  processingMemberId === memberToTransfer.id ||
+                  transferCountdown > 0
+                }
+                onClick={handleTransfer}
+              >
+                {processingMemberId === memberToTransfer.id
+                  ? "양도 중"
+                  : transferCountdown > 0
+                    ? `${transferCountdown}초`
+                    : "양도하기"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
       <BottomNav />
     </main>

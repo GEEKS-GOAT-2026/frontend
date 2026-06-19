@@ -133,3 +133,88 @@
   line-height: 1.5;
   margin-bottom: 14px;
 }
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 35, 70, 0.32);
+  padding: 20px;
+}
+
+.confirmModal {
+  width: min(100%, 280px);
+  border-radius: 12px;
+  background: #fff;
+  padding: 20px 16px 16px;
+  box-shadow: 0 12px 28px rgba(0, 40, 90, 0.28);
+}
+
+.confirmModal strong {
+  display: block;
+  color: #0050c8;
+  font-size: 17px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.confirmModal p {
+  color: #1d2730;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.warningText,
+.countdownText {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.warningText {
+  color: #ef2f2f;
+  margin-bottom: 6px;
+}
+
+.countdownText {
+  color: #0050c8;
+  margin-bottom: 14px;
+}
+
+.modalActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.cancelModalButton,
+.confirmTransferButton {
+  min-height: 40px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.cancelModalButton {
+  background: #eef6ff;
+  color: #0050c8;
+}
+
+.confirmTransferButton {
+  background: #0050c8;
+  color: #fff;
+}
+
+.cancelModalButton:disabled,
+.confirmTransferButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
