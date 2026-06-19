@@ -12,26 +12,22 @@ const apiBaseUrl =
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const token = searchParams.get("token") ?? searchParams.get("accessToken");
+  const error = searchParams.get("error");
+  const message = searchParams.get("message");
+  const loginError = error && !token
+    ? message ?? "로그인에 실패했습니다. 학교 계정으로 다시 시도하세요."
+    : "";
 
   const backendLoginUrl =
     process.env.NEXT_PUBLIC_BACKEND_LOGIN_URL ??
     "https://port-0-dongnea-mhfzs5l502d0035e.sel3.cloudtype.app/oauth2/authorization/google";
 
   useEffect(() => {
-    const token = searchParams.get("token") ?? searchParams.get("accessToken");
-    const error = searchParams.get("error");
-    const message = searchParams.get("message");
-
     // 로그인 실패 처리: error 쿼리 파라미터가 넘어오면 경고 및 콘솔 출력
     if (error && !token) {
       console.warn("OAuth login error:", error, message);
-      const userMessage = message ?? "로그인에 실패했습니다. 학교 계정으로 다시 시도하세요.";
-      try {
-        alert(`로그인 실패: ${userMessage}`);
-      } catch (e) {
-        // alert가 없을 수 있는 환경을 대비해 콘솔에 추가 출력
-        console.warn("Could not show alert; falling back to console.", e);
-      }
+      localStorage.removeItem("accessToken");
       return;
     }
 
@@ -40,12 +36,6 @@ function LoginContent() {
       console.log("Received OAuth token:", token);
       localStorage.setItem("accessToken", token);
       router.replace("/main");
-
-      try {
-        alert("로그인 성공: 토큰을 저장했습니다.");
-      } catch (e) {
-        console.warn("Could not show alert; falling back to console.", e);
-      }
 
       const fetchUser = async () => {
         try {
@@ -77,7 +67,7 @@ function LoginContent() {
 
       void fetchUser();
     }
-  }, [router, searchParams]);
+  }, [error, message, router, token]);
 
   const handleGoogleLogin = () => {
     window.location.href = backendLoginUrl;
@@ -116,9 +106,15 @@ function LoginContent() {
         </button>
 
         {/* 안내 문구 */}
-        <p className={styles.notice}>
-          인하대 계정으로만 로그인이 가능합니다
-        </p>
+        {loginError ? (
+          <p className={styles.errorMessage} role="alert">
+            {loginError}
+          </p>
+        ) : (
+          <p className={styles.notice}>
+            인하대 계정으로만 로그인이 가능합니다
+          </p>
+        )}
 
       </div>
     </main>
