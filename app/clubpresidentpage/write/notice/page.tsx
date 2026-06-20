@@ -144,10 +144,6 @@ function NoticeWriteContent() {
     }
   };
 
-  const handlePreview = () => {
-    alert("미리보기 기능은 준비 중입니다.");
-  };
-
   return (
     <main className={styles.container}>
       <header className={styles.header}>
@@ -163,7 +159,6 @@ function NoticeWriteContent() {
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.modeTabs} aria-label="공지사항 작성 모드">
           <span className={styles.activeTab}>공지</span>
-          <span>임시저장 가능</span>
         </div>
 
         <label className={styles.field}>
@@ -211,11 +206,6 @@ function NoticeWriteContent() {
               <button type="button" onClick={clearAttachment}>삭제</button>
             </div>
           )}
-        </div>
-
-        <div className={styles.actionRow}>
-          <button type="button" className={styles.draftButton}>임시저장</button>
-          <button type="button" className={styles.previewButton} onClick={handlePreview}>미리보기</button>
         </div>
 
         <button type="submit" className={styles.submitButton} disabled={isSaving}>

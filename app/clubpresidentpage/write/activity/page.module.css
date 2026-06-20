@@ -207,15 +207,6 @@
   cursor: pointer;
 }
 
-.actionRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 2px;
-}
-
-.draftButton,
-.previewButton,
 .submitButton {
   height: 46px;
   border: none;
@@ -223,21 +214,9 @@
   font-size: 14px;
   font-weight: 900;
   cursor: pointer;
-}
-
-.draftButton {
-  background: #fff;
-  color: #0057c2;
-}
-
-.previewButton,
-.submitButton {
   background: #0057c2;
   color: #fff;
   box-shadow: 0 4px 8px rgba(0, 80, 200, 0.22);
-}
-
-.submitButton {
   margin-top: 2px;
 }
 

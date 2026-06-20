@@ -128,10 +128,6 @@ function EventWriteContent() {
     }
   };
 
-  const handlePreview = () => {
-    alert("미리보기 기능은 준비 중입니다.");
-  };
-
   return (
     <main className={styles.container}>
       <header className={styles.header}>
@@ -148,7 +144,6 @@ function EventWriteContent() {
         <div className={styles.modeTabs} aria-label="행사글 작성 모드">
           <span className={styles.activeTab}>행사</span>
           <span>공개</span>
-          <span>임시저장 가능</span>
         </div>
 
         <label className={styles.field}>
@@ -188,11 +183,6 @@ function EventWriteContent() {
           <span>본문</span>
           <textarea value={form.description} onChange={(event) => updateForm("description", event.target.value)} placeholder="행사 소개, 참여 방법, 준비물, 문의 연락처를 입력합니다." required />
         </label>
-
-        <div className={styles.actionRow}>
-          <button type="button" className={styles.draftButton}>임시저장</button>
-          <button type="button" className={styles.previewButton} onClick={handlePreview}>미리보기</button>
-        </div>
 
         <button type="submit" className={styles.submitButton} disabled={isSaving}>
           {isSaving ? "저장 중" : "저장하기"}
