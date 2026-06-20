@@ -1,11 +1,11 @@
 .container {
   min-height: 100vh;
-  background: #F6FAFF;
+  background: #F3F6FA;
   padding: 22px 14px 116px;
 }
 
 .header {
-  background: #DCEEFF;
+  background: #E8F0F7;
   display: flex;
   align-items: center;
   gap: 10px;
