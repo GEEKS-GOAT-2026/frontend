@@ -1,12 +1,13 @@
 .container {
   min-height: 100vh;
 
-  background: #8DBEE4;
+  background: #F6FAFF;
 
   padding: 18px 14px 120px;
 }
 
 .header {
+  background: #DCEEFF;
   margin-bottom: 22px;
 }
 
