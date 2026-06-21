@@ -6,7 +6,7 @@ import styles from "./BottomNav.module.css";
 
 const navItems = [
   { href: "/main", icon: "/main.svg", label: "home" },
-  { href: "/clubs", icon: "/clubs.svg", label: "clubs" },
+  { href: "/clubs", icon: "/clubs.svg", label: "search" },
   { href: "/events", icon: "/events.svg", label: "events" },
   { href: "/myclub", icon: "/apply.svg", label: "myclub" },
   { href: "/mypage", icon: "/mypage.svg", label: "mypage" },
