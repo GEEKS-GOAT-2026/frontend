@@ -522,7 +522,16 @@ function ClubPresidentContent() {
               </div>
 
               <div className={styles.memberInfo}>
-                <h3>{displayName || "이름 정보 없음"}</h3>
+                <div className={styles.nameRow}>
+                  <h3>{displayName || "이름 정보 없음"}</h3>
+                  {isPresident && (
+                    <img
+                      src="/Crown.svg"
+                      alt="회장"
+                      className={styles.crownIcon}
+                    />
+                  )}
+                </div>
                 <p>{displayMajor || "학과 정보 없음"}</p>
                 <p>{displayStudentId || "학번 정보 없음"}</p>
                 <p>{displayEmail || "이메일 정보 없음"}</p>
@@ -562,16 +571,6 @@ function ClubPresidentContent() {
                   >
                     거절
                   </button>
-                </div>
-              )}
-
-              {activeTab === "member" && isPresident && (
-                <div className={styles.buttonWrap}>
-                  <img
-                    src="/Crown.svg"
-                    alt="회장"
-                    className={styles.crownIcon}
-                  />
                 </div>
               )}
 

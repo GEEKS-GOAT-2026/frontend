@@ -196,6 +196,17 @@
   margin-bottom: 6px;
 }
 
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.nameRow h3 {
+  margin-bottom: 0;
+}
+
 .memberInfo p {
   font-size: 13px;
 
@@ -237,8 +248,8 @@
 }
 
 .crownIcon {
-  width: 42px;
-  height: 42px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
 }
 
