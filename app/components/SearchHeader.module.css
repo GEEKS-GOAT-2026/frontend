@@ -27,14 +27,3 @@
   outline: none;
 }
 
-.searchButton {
-  width: 42px;
-  height: 42px;
-  border: none;
-  border-radius: 50%;
-  background: white;
-  color: #0047b2;
-  font-size: 18px;
-  cursor: pointer;
-  flex-shrink: 0;
-}

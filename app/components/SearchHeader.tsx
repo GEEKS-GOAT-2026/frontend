@@ -22,9 +22,6 @@ export default function SearchHeader({
           onChange={(event) => onChange?.(event.target.value)}
           className={styles.searchInput}
         />
-        <button type="button" className={styles.searchButton} aria-label="검색">
-          ?
-        </button>
       </div>
     </header>
   );
