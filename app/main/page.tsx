@@ -10,11 +10,19 @@ import { Club, ClubEvent, getClubs, getRecentEvents } from "../lib/api";
 
 import styles from "./page.module.css";
 
-const categories = ["전체", "학술", "예술/문화", "스포츠", "봉사", "소모임"];
+const categories = [
+  { label: "전체", values: [] },
+  { label: "학술", values: ["학술"] },
+  { label: "예술/문화", values: ["예술", "문화", "공연", "예술/문화"] },
+  { label: "스포츠", values: ["체육", "스포츠"] },
+  { label: "봉사", values: ["봉사"] },
+  { label: "소모임", values: ["취미", "소모임"] },
+];
 
 export default function MainPage() {
   const router = useRouter();
   const [clubs, setClubs] = useState<Club[]>([]);
+  const [activeCategory, setActiveCategory] = useState("전체");
   const [events, setEvents] = useState<ClubEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isEventLoading, setIsEventLoading] = useState(true);
@@ -26,7 +34,7 @@ export default function MainPage() {
       try {
         const data = await getClubs({
           page: 0,
-          size: 3,
+          size: 100,
           hasActiveRecruitment: true,
         });
 
@@ -40,6 +48,14 @@ export default function MainPage() {
 
     void loadClubs();
   }, []);
+
+  const selectedCategory = categories.find(({ label }) => label === activeCategory);
+  const visibleClubs = clubs
+    .filter(
+      (club) =>
+        !selectedCategory?.values.length || selectedCategory.values.includes(club.category)
+    )
+    .slice(0, 3);
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -69,8 +85,14 @@ export default function MainPage() {
         </div>
         <div className={styles.categoryWrap}>
           {categories.map((category) => (
-            <button key={category} type="button">
-              {category}
+            <button
+              key={category.label}
+              type="button"
+              className={activeCategory === category.label ? styles.activeCategory : ""}
+              aria-pressed={activeCategory === category.label}
+              onClick={() => setActiveCategory(category.label)}
+            >
+              {category.label}
             </button>
           ))}
         </div>
@@ -86,12 +108,12 @@ export default function MainPage() {
 
         {isLoading && <p className={styles.statusText}>동아리를 불러오는 중입니다.</p>}
         {error && <p className={styles.statusText}>{error}</p>}
-        {!isLoading && !error && clubs.length === 0 && (
+        {!isLoading && !error && visibleClubs.length === 0 && (
           <p className={styles.statusText}>현재 표시할 동아리가 없습니다.</p>
         )}
 
         <div className={styles.cardList}>
-          {clubs.map((club) => (
+          {visibleClubs.map((club) => (
             <ClubCard
               key={club.id}
               title={club.name}
