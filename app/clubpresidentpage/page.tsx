@@ -322,7 +322,28 @@ function ClubPresidentContent() {
     setRemoveCountdown(0);
   };
 
-  const filteredMembers = useMemo(() => members, [members]);
+  const filteredMembers = useMemo(() => {
+    if (activeTab !== "member") {
+      return members;
+    }
+
+    const normalizedPresidentEmail = presidentEmail.toLowerCase();
+
+    return [...members].sort((first, second) => {
+      const firstIsPresident =
+        Boolean(normalizedPresidentEmail) &&
+        first.email.toLowerCase() === normalizedPresidentEmail;
+      const secondIsPresident =
+        Boolean(normalizedPresidentEmail) &&
+        second.email.toLowerCase() === normalizedPresidentEmail;
+
+      if (firstIsPresident !== secondIsPresident) {
+        return firstIsPresident ? -1 : 1;
+      }
+
+      return first.name.localeCompare(second.name, "ko");
+    });
+  }, [activeTab, members, presidentEmail]);
 
   const handleAccept = async (memberId: number) => {
     if (!clubId) {
