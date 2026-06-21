@@ -19,6 +19,16 @@ import styles from "./page.module.css";
 
 type ActiveTab = "member" | "applicant";
 
+function isPresidentRole(role: string) {
+  const normalizedRole = role.toUpperCase();
+
+  return (
+    normalizedRole.includes("PRESIDENT") ||
+    normalizedRole.includes("CHAIR") ||
+    role.includes("회장")
+  );
+}
+
 function getManagedClubIdFromQuery(searchParams: URLSearchParams) {
   const rawClubId = searchParams.get("clubId");
   const parsedClubId = rawClubId ? Number(rawClubId) : NaN;
@@ -180,6 +190,7 @@ function ClubPresidentContent() {
   const [search, setSearch] = useState("");
   const [clubId, setClubId] = useState<number | null>(null);
   const [clubName, setClubName] = useState("회장 계정");
+  const [presidentEmail, setPresidentEmail] = useState("");
   const [members, setMembers] = useState<ClubMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [processingMemberId, setProcessingMemberId] = useState<number | null>(null);
@@ -205,6 +216,7 @@ function ClubPresidentContent() {
 
         setClubId(targetClub.clubId);
         setClubName(targetClub.clubName);
+        setPresidentEmail(isPresidentRole(targetClub.role) ? user.email : "");
       } catch (err) {
         setError(
           err instanceof Error
@@ -494,6 +506,10 @@ function ClubPresidentContent() {
             activeTab === "applicant"
               ? getApplicantField(member, answers, "phone")
               : member.phone;
+          const isPresident =
+            activeTab === "member" &&
+            Boolean(presidentEmail) &&
+            member.email.toLowerCase() === presidentEmail.toLowerCase();
 
           return (
             <div key={member.id} className={styles.memberCard}>
@@ -549,7 +565,17 @@ function ClubPresidentContent() {
                 </div>
               )}
 
-              {activeTab === "member" && (
+              {activeTab === "member" && isPresident && (
+                <div className={styles.buttonWrap}>
+                  <img
+                    src="/Crown.svg"
+                    alt="회장"
+                    className={styles.crownIcon}
+                  />
+                </div>
+              )}
+
+              {activeTab === "member" && !isPresident && (
                 <div className={styles.buttonWrap}>
                   <button
                     type="button"

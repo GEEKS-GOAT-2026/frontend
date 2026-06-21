@@ -236,6 +236,12 @@
   gap: 10px;
 }
 
+.crownIcon {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
 .acceptButton {
   border: none;
 
